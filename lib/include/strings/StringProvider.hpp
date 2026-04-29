@@ -51,8 +51,10 @@ public:
     [[nodiscard]] constexpr const CharType*
     getString(StringId id) const noexcept
     {
-        if (!strings.contains(current)) return "--missing localization--";
-        else if (!strings.at(current).contains(id)) return "--missing string--";
+        if (!strings.contains(current))
+            return "--missing localization--";
+        else if (!strings.at(current).contains(id))
+            return "--missing string--";
         return strings.at(current).at(id).data();
     }
 
