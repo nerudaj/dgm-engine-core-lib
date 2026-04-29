@@ -11,7 +11,7 @@
  * \detail This is meant for storing settings, save files, user-created content,
  * etc.
  *
- * On Windows, this storage defaults to %APPDATA%/<AppName>.
+ * On Windows, this storage defaults to %APPDATA%/projectName.
  * On Android, this storage defaults to /Android/data/<appid>/files
  */
 class AppStorage
