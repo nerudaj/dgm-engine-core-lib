@@ -1,8 +1,11 @@
+set ( NLOHMANN_VERSION "3.12.0" )
 set ( SFML_VERSION "3.1.0" )
 set ( TGUI_VERSION "1.x" )
 set ( DGM_LIB_VERSION "main" )
 set ( RANGEV3_VERSION "master" )
 set ( FMTLIB_VERSION "12.1.0" )
+
+CPMAddPackage("gh:nlohmann/json#v${NLOHMANN_VERSION}")
 
 if ( "${CMAKE_SYSTEM_NAME}" STREQUAL "Android" )
 	set ( BUILD_SHARED_LIBS ON )

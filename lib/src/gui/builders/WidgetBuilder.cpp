@@ -1,7 +1,6 @@
 #include "gui/builders/WidgetBuilder.hpp"
 #include "gui/Sizers.hpp"
 #include "gui/TguiHelper.hpp"
-#include "misc/Compatibility.hpp"
 #include "types/SemanticTypes.hpp"
 #include <TGUI/Backend/SFML-Graphics.hpp>
 #include <TGUI/TGUI.hpp>
@@ -43,14 +42,14 @@ tgui::Button::Ptr WidgetBuilder::createButton(
     const Label& label,
     std::function<void(void)> onClick,
     const Sizer& sizer,
-    SoundPlayer& player,
+    GuiAudioInterface& player,
     WidgetOptions options)
 {
     auto&& button = tgui::Button::create(label);
     button->onClick(
         [onClick = std::move(onClick), &player]
         {
-            player.playPovSound(SoundId::Click);
+            player.playClick();
             onClick();
         });
     button->setTextSize(sizer.getBaseFontSize());
@@ -65,7 +64,7 @@ tgui::Button::Ptr WidgetBuilder::createButton(
     const Label& label,
     std::function<void(void)> onClick,
     const Sizer& sizer,
-    SoundPlayer& player,
+    GuiAudioInterface& player,
     WidgetOptions options)
 {
     auto&& button = createButton(label, onClick, sizer, player, options);
@@ -79,7 +78,7 @@ tgui::Button::Ptr WidgetBuilder::createButton(
 [[nodiscard]] tgui::Button::Ptr WidgetBuilder::createTexturedButton(
     const tgui::Texture& texture,
     std::function<void(void)> onClick,
-    SoundPlayer& player,
+    GuiAudioInterface& player,
     WidgetOptions options)
 {
     auto btn = tgui::Button::create();
@@ -89,7 +88,7 @@ tgui::Button::Ptr WidgetBuilder::createButton(
     btn->onClick(
         [onClick = std::move(onClick), &player]
         {
-            player.playPovSound(SoundId::Click);
+            player.playClick();
             onClick();
         });
     btn->setSize({ "100%", "100%" });
@@ -202,7 +201,7 @@ tgui::Tabs::Ptr WidgetBuilder::createTabs(
     const std::vector<Label>& tabLabels,
     std::function<void(const tgui::String&)> onTabChange,
     const Sizer& sizer,
-    SoundPlayer& player,
+    GuiAudioInterface& player,
     WidgetOptions options)
 {
     auto&& tabs = tgui::Tabs::create();
@@ -218,7 +217,7 @@ tgui::Tabs::Ptr WidgetBuilder::createTabs(
         [onTabChange = std::move(onTabChange),
          &player](const tgui::String& tabname)
         {
-            player.playPovSound(SoundId::Click);
+            player.playClick();
             onTabChange(tabname);
         });
 
@@ -238,7 +237,7 @@ tgui::Container::Ptr WidgetBuilder::createCarousel(
     const size_t pageCount,
     std::function<void(const tgui::Container::Ptr, size_t)> onPageChange,
     const Sizer& sizer,
-    SoundPlayer& player)
+    GuiAudioInterface& player)
 {
     auto pageLabel = createTextLabel("x / x", sizer, "justify"_true);
     auto content = tgui::Group::create();

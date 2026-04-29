@@ -1,6 +1,6 @@
 #pragma once
 
-#include "audio/SoundPlayer.hpp"
+#include "audio/GuiAudioInterface.hpp"
 #include "gui/Sizers.hpp"
 #include "gui/builders/ButtonListBuilder.hpp"
 #include "gui/builders/DefaultLayoutBuilder.hpp"
@@ -11,14 +11,15 @@
 #include "gui/builders/WidgetBuilder.hpp"
 #include "strings/StringProvider.hpp"
 
+template<ScopedEnum StringId>
 class [[nodiscard]] GuiBuilderFactory final
 {
 public:
     GuiBuilderFactory(
         const Sizer& sizer,
         const StringProvider& strings,
-        SoundPlayer& player) noexcept
-        : sizer(sizer), strings(strings), player(player)
+        GuiAudioInterface& audioPlayer) noexcept
+        : sizer(sizer), strings(strings), audioPlayer(audioPlayer)
     {
     }
 
@@ -28,7 +29,7 @@ public:
 public:
     ButtonListBuilder createButtonListBuilder() const
     {
-        return ButtonListBuilder(strings, sizer, player);
+        return ButtonListBuilder(strings, sizer, audioPlayer);
     }
 
     DefaultLayoutBuilder createDefaultLayoutBuiler() const
@@ -48,7 +49,7 @@ public:
 
     TabbedLayoutBuilder createTabbedLayoutBuilder() const
     {
-        return TabbedLayoutBuilder(strings, sizer, player);
+        return TabbedLayoutBuilder(strings, sizer, audioPlayer);
     }
 
     TableBuilder createTableBuilder() const
@@ -58,6 +59,6 @@ public:
 
 private:
     const Sizer& sizer;
-    const StringProvider& strings;
-    SoundPlayer& player;
+    const StringProvider<StringId>& strings;
+    GuiAudioInterface& audioPlayer;
 };

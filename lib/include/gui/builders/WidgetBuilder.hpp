@@ -1,6 +1,6 @@
 #pragma once
 
-#include "audio/SoundPlayer.hpp"
+#include "audio/GuiAudioInterface.hpp"
 #include "gui/Gui.hpp"
 #include "gui/HeadingLevel.hpp"
 #include "gui/Sizers.hpp"
@@ -9,8 +9,6 @@
 #include <TGUI/TGUI.hpp>
 #include <functional>
 #include <string>
-
-const tgui::Color PANEL_BACKGROUND_COLOR = tgui::Color(255, 255, 255, 64);
 
 // https://github.com/llvm/llvm-project/issues/36032
 struct [[nodiscard]] WidgetOptions final
@@ -57,7 +55,7 @@ public:
         const Label& label,
         std::function<void(void)> onClick,
         const Sizer& sizer,
-        SoundPlayer& player,
+        GuiAudioInterface& audioPlayer,
         WidgetOptions options = WidgetOptions {});
 
     // Create a button that can fit inside an option row
@@ -65,13 +63,13 @@ public:
         const Label& label,
         std::function<void(void)> onClick,
         const Sizer& sizer,
-        SoundPlayer& player,
+        GuiAudioInterface& audioPlayer,
         WidgetOptions options = WidgetOptions {});
 
     [[nodiscard]] static tgui::Button::Ptr createTexturedButton(
         const tgui::Texture& texture,
         std::function<void(void)> onClick,
-        SoundPlayer& player,
+        GuiAudioInterface& audioPlayer,
         WidgetOptions options);
 
     [[nodiscard]] static tgui::CheckBox::Ptr createCheckbox(
@@ -126,7 +124,7 @@ public:
         const std::vector<Label>& tabLabels,
         std::function<void(const tgui::String&)> onTabChange,
         const Sizer& sizer,
-        SoundPlayer& player,
+        GuiAudioInterface& audioPlayer,
         WidgetOptions options = {});
 
     [[nodiscard]] static tgui::SeparatorLine::Ptr createSeparator();
@@ -135,7 +133,7 @@ public:
         const size_t pageCount,
         std::function<void(const tgui::Container::Ptr, size_t)> onPageChange,
         const Sizer& sizer,
-        SoundPlayer& player);
+        GuiAudioInterface& audioPlayer);
 
     [[nodiscard]] static constexpr std::string
     getUnsignedNumericValidator() noexcept

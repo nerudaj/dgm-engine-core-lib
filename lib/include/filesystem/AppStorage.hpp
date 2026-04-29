@@ -18,10 +18,12 @@ class AppStorage
 {
 public:
     static std::expected<std::string, dgm::Error>
-    loadFile(const std::filesystem::path& file);
+    loadFile(const std::string& projectName, const std::filesystem::path& file);
 
-    static void
-    saveFile(const std::filesystem::path& file, const std::string& data);
+    static void saveFile(
+        const std::string& projectName,
+        const std::filesystem::path& file,
+        const std::string& data);
 
     /**
      * Helper wrapper method for saveFile. If an object is serializable into
@@ -29,7 +31,9 @@ public:
      */
     template<class Serializable>
     static void saveFile(
-        const std::filesystem::path& path, const Serializable& serializable)
+        const std::string& projectName,
+        const std::filesystem::path& path,
+        const Serializable& serializable)
     {
         saveFile(path, nlohmann::json(serializable).dump(4));
     }

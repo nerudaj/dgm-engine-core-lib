@@ -2,7 +2,6 @@
 
 #include "gui/HeadingLevel.hpp"
 #include "gui/Sizers.hpp"
-#include "misc/Compatibility.hpp"
 #include <TGUI/Backend/SFML-Graphics.hpp>
 #include <TGUI/TGUI.hpp>
 
@@ -188,6 +187,7 @@ public:
 
     priv::LayoutBuilderWithBackground withNoBackgroundImage();
 
+    // TODO: this
     priv::LayoutBuilderWithBackground withNoBackground();
 
 private:

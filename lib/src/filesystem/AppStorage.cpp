@@ -1,5 +1,4 @@
 #include "filesystem/AppStorage.hpp"
-#include "misc/CMakeVars.hpp"
 #include <DGM/classes/Utility.hpp>
 #include <filesystem>
 #include <fstream>
@@ -13,7 +12,7 @@
 #include <shlobj.h>
 #endif
 
-std::filesystem::path getAppdataPath()
+std::filesystem::path getAppdataPath(const std::string& projectName)
 {
 #ifdef ANDROID
     return std::filesystem::path(sf::getNativeActivity()->externalDataPath);
@@ -32,21 +31,23 @@ std::filesystem::path getAppdataPath()
     using convert_type = std::codecvt_utf8<wchar_t>;
     std::wstring_convert<convert_type, wchar_t> converter;
 
-    return std::filesystem::path(converter.to_bytes(result)) / CMakeVars::TITLE;
+    return std::filesystem::path(converter.to_bytes(result)) / projectName;
 #endif
 }
 
-std::expected<std::string, dgm::Error>
-AppStorage::loadFile(const std::filesystem::path& file)
+std::expected<std::string, dgm::Error> AppStorage::loadFile(
+    const std::string& projectName, const std::filesystem::path& file)
 {
-    const auto appdataPath = getAppdataPath();
+    const auto appdataPath = getAppdataPath(projectName);
     return dgm::Utility::loadFileAllText(appdataPath / file);
 }
 
 void AppStorage::saveFile(
-    const std::filesystem::path& file, const std::string& data)
+    const std::string& projectName,
+    const std::filesystem::path& file,
+    const std::string& data)
 {
-    const auto appdataPath = getAppdataPath();
+    const auto appdataPath = getAppdataPath(projectName);
 #ifndef ANDROID
     if (!std::filesystem::exists(appdataPath))
     {

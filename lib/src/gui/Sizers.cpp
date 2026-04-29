@@ -122,28 +122,27 @@ unsigned GetSystemMetricsForDpi(DWORD nIndex, UINT dpi)
 unsigned Sizer::getBaseContainerHeight() const
 {
 #ifdef ANDROID
-    return BaseSizeProviderSingleton::getInstance().getBaseContainerHeight()
-           * settings.uiScale;
+    const auto height =
+        BaseSizeProviderSingleton::getInstance().getBaseContainerHeight()
+        * scale;
 #elif LINUX
-    return 22u;
+    const auto height = 22u;
 #else
     const unsigned dpi = GetDpiForSystem();
-    return static_cast<unsigned>(
-        (GetSystemMetricsForDpi(SM_CYCAPTION, dpi)
-         + GetSystemMetricsForDpi(SM_CYSIZEFRAME, dpi)
-         + GetSystemMetricsForDpi(SM_CYEDGE, dpi) * 2)
-        * settings.uiScale);
+    const auto height = GetSystemMetricsForDpi(SM_CYCAPTION, dpi)
+                        + GetSystemMetricsForDpi(SM_CYSIZEFRAME, dpi)
+                        + GetSystemMetricsForDpi(SM_CYEDGE, dpi) * 2;
 #endif
+    return static_cast<unsigned>(height * scale);
 }
 
 unsigned Sizer::getBaseFontSize() const
 {
 #ifdef ANDROID
-    return BaseSizeProviderSingleton::getInstance().getBaseFontSize()
-           * settings.uiScale;
+    const auto size =
+        BaseSizeProviderSingleton::getInstance().getBaseFontSize();
 #else
-    return static_cast<unsigned>(
-        getBaseContainerHeight() / CONTAINER_PADDING_MULTIPLIER
-        * settings.uiScale);
+    const auto size = getBaseContainerHeight() / CONTAINER_PADDING_MULTIPLIER;
 #endif
+    return static_cast<float>(size * scale);
 }

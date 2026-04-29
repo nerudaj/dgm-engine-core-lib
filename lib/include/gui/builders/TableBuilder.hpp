@@ -1,7 +1,6 @@
 #pragma once
 
 #include "gui/Sizers.hpp"
-#include "misc/Compatibility.hpp"
 #include <TGUI/Backend/SFML-Graphics.hpp>
 #include <TGUI/TGUI.hpp>
 #include <optional>

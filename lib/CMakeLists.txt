@@ -11,6 +11,7 @@ if ( "${CMAKE_SYSTEM_NAME}" STREQUAL "Android" )
             SFML::Audio
             fmt::fmt
             range-v3::range-v3
+            nlohmann_json::nlohmann_json
     )
 else ()
     make_static_library (
@@ -19,6 +20,7 @@ else ()
             dgm::dgm-lib
             TGUI::TGUI
             SFML::Audio
+            nlohmann_json::nlohmann_json
     )
 endif ()
 
