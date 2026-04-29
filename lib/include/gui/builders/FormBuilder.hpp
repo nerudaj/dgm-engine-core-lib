@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gui/Sizers.hpp"
+#include "gui/builders/WidgetBuilder.hpp"
 #include "strings/StringProvider.hpp"
 #include <DGM/classes/Compatibility.hpp>
 #include <TGUI/Backend/SFML-Graphics.hpp>
@@ -26,10 +27,11 @@ public:
 public:
     FormBuilder& addOption(const StringId labelId, tgui::Widget::Ptr widget)
     {
-        rowsToBuild.push_back({
-            .label = strings.getString(labelId),
-            .widget = widget,
-        });
+        rowsToBuild.push_back(
+            {
+                .label = strings.getString(labelId),
+                .widget = widget,
+            });
         return *this;
     }
 
@@ -38,9 +40,10 @@ public:
         tgui::Widget::Ptr widget,
         const std::string widgetId)
     {
-        rowsToBuild.push_back({ .label = strings.getString(labelId),
-                                .widget = widget,
-                                .widgetId = widgetId });
+        rowsToBuild.push_back(
+            { .label = strings.getString(labelId),
+              .widget = widget,
+              .widgetId = widgetId });
         return *this;
     }
 
@@ -49,9 +52,10 @@ public:
         tgui::Widget::Ptr widget,
         tgui::Button::Ptr submitBtn)
     {
-        rowsToBuild.push_back({ .label = strings.getString(labelId),
-                                .widget = widget,
-                                .submitBtn = submitBtn });
+        rowsToBuild.push_back(
+            { .label = strings.getString(labelId),
+              .widget = widget,
+              .submitBtn = submitBtn });
         return *this;
     }
 

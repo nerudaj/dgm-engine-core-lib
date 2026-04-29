@@ -1,6 +1,7 @@
 #pragma once
 
 #include "audio/GuiAudioInterface.hpp"
+#include "gui/builders/WidgetBuilder.hpp"
 #include "gui/Sizers.hpp"
 #include "misc/Compatibility.hpp"
 #include "strings/StringProvider.hpp"

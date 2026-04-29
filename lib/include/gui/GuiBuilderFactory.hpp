@@ -17,7 +17,7 @@ class [[nodiscard]] GuiBuilderFactory final
 public:
     GuiBuilderFactory(
         const Sizer& sizer,
-        const StringProvider& strings,
+        const StringProvider<StringId>& strings,
         GuiAudioInterface& audioPlayer) noexcept
         : sizer(sizer), strings(strings), audioPlayer(audioPlayer)
     {
@@ -27,7 +27,7 @@ public:
     GuiBuilderFactory(const GuiBuilderFactory&) = delete;
 
 public:
-    ButtonListBuilder createButtonListBuilder() const
+    ButtonListBuilder<StringId> createButtonListBuilder() const
     {
         return ButtonListBuilder(strings, sizer, audioPlayer);
     }
@@ -37,7 +37,7 @@ public:
         return DefaultLayoutBuilder(sizer);
     }
 
-    FormBuilder createFormBuilder() const
+    FormBuilder<StringId> createFormBuilder() const
     {
         return FormBuilder(strings, sizer);
     }
@@ -47,7 +47,7 @@ public:
         return NavbarLayoutBuilder(sizer);
     }
 
-    TabbedLayoutBuilder createTabbedLayoutBuilder() const
+    TabbedLayoutBuilder<StringId> createTabbedLayoutBuilder() const
     {
         return TabbedLayoutBuilder(strings, sizer, audioPlayer);
     }

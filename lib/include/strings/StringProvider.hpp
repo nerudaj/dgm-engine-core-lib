@@ -7,35 +7,33 @@
 #include <utility>
 #include <vector>
 
+using Localization = std::map<StringId, std::string_view>;
+using UnderlyingLanguageType = int;
+
 template<class E>
 concept ScopedEnum = std::is_scoped_enum_v<E>;
+
+template<class E>
+concept LanguageEnum =
+    std::is_scoped_enum_v<E>
+    && std::is_same_v<UnderlyingLanguageType, std::underlying_type_t<E>>;
 
 template<ScopedEnum StringId>
 class [[nodiscard]] StringProvider final
 {
 public:
-    using Localization = std::map<StringId, std::string_view>;
-    using UnderlyingLanguageType = int;
-
-    template<class E>
-    concept LanguageEnum =
-        std::is_scoped_enum_v<E>
-        && std::is_same_v<UnderlyingLanguageType, std::underlying_type_t<E>>;
 
 public:
     template<LanguageEnum Language>
     explicit StringProvider(
         Language primary, const std::map<Language, Localization>& localizations)
-        : current(primary), strings(localizations)
+        : current(std::to_underlying(primary))
     {
-        // For untranslated strings, use strings from the primary language
-        for (auto&& [lang, localization] : strings)
+        for (auto&& [language, localization] : localizations)
         {
-            for (auto&& idx : std::views::iota(size_t {}, localization.size()))
+            for (auto&& [id, str] : localization)
             {
-                if (localization[idx].empty())
-                    localization[idx] =
-                        strings[std::to_underlying(primary)][idx];
+                strings[std::to_underlying(language)][id] = str;
             }
         }
     }
@@ -53,10 +51,9 @@ public:
     [[nodiscard]] constexpr const CharType*
     getString(StringId id) const noexcept
     {
-        const auto result =
-            strings[std::to_underlying(current)][std::to_underlying(id)].data();
-        if (!result) return "--missing string--";
-        return result;
+        if (!strings.contains(current)) return "--missing localization--";
+        else if (!strings.at(current).contains(id)) return "--missing string--";
+        return strings.at(current).at(id).data();
     }
 
 private:

@@ -88,7 +88,7 @@ public:
 
 private:
     [[nodiscard]] static tgui::Container::Ptr
-    createContentPanel(bool isScrollable) const
+    createContentPanel(bool isScrollable)
     {
         if (isScrollable)
         {

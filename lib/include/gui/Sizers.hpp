@@ -3,10 +3,6 @@
 class [[nodiscard]] Sizer final
 {
 public:
-    Sizer(Sizer&&) = default;
-    Sizer(const Sizer&) = delete;
-
-public:
     void setScale(float newScale)
     {
         scale = newScale;
