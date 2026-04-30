@@ -2,6 +2,7 @@
 
 #include "gui/HeadingLevel.hpp"
 #include "gui/Sizers.hpp"
+#include "strings/StringProvider.hpp"
 #include <TGUI/Backend/SFML-Graphics.hpp>
 #include <TGUI/TGUI.hpp>
 
@@ -148,51 +149,103 @@ namespace priv
         BuilderProperties props;
     };
 
+    template<ScopedEnum StringId>
     class [[nodiscard]] LayoutBuilderWithBackground final
     {
     public:
         LayoutBuilderWithBackground(
             tgui::Container::Ptr container,
             const BuilderProperties& props,
-            const Sizer& sizer)
-            : sizer(sizer), container(container), props(props)
+            const Sizer& sizer,
+            const StringProvider<StringId>& strings)
+            : sizer(sizer), container(container), props(props), strings(strings)
         {
         }
 
     public:
         LayoutBuilderWithBackgroundAndTitle
-        withTitle(const std::string& title, HeadingLevel level);
+        withTitle(StringId stringId, HeadingLevel level)
+        {
+            auto&& panel = tgui::Group::create({ "100%", props.titleHeight });
+            panel->add(WidgetBuilder::createHeading(
+                strings.getString(stringId), sizer, level));
+            container->add(panel);
+            return LayoutBuilderWithBackgroundAndTitle(container, props);
+        }
 
         LayoutBuilderWithBackgroundAndTitle
-        withTexturedTitle(const sf::Texture& texture);
+        withTexturedTitle(const sf::Texture& texture)
+        {
+            tgui::Texture ttexture;
+            ttexture.loadFromPixelData(
+                texture.getSize(), texture.copyToImage().getPixelsPtr());
+
+            auto&& panelContainer = tgui::Group::create(
+                { texture.getSize().x * props.titleHeight / texture.getSize().y,
+                  props.titleHeight });
+            panelContainer->setPosition(
+                { "parent.width / 2 - width / 2", "0%" });
+
+            auto panel = tgui::Panel::create();
+            panel->getRenderer()->setTextureBackground(ttexture);
+
+            container->add(panelContainer);
+
+            return LayoutBuilderWithBackgroundAndTitle(container, props);
+        }
 
     private:
         const Sizer& sizer;
+        const StringProvider<StringId>& strings;
         tgui::Container::Ptr container;
         BuilderProperties props;
     };
 } // namespace priv
 
+template<ScopedEnum StringId>
 class [[nodiscard]] DefaultLayoutBuilder final
 {
 public:
-    constexpr explicit DefaultLayoutBuilder(const Sizer& sizer) noexcept
-        : sizer(sizer)
+    constexpr explicit DefaultLayoutBuilder(
+        const Sizer& sizer, const StringProvider<StringId>& strings) noexcept
+        : sizer(sizer), strings(strings)
     {
     }
 
 public:
     priv::LayoutBuilderWithBackground
-    withBackgroundImage(const sf::Texture& texture);
+    withBackgroundImage(const sf::Texture& texture)
+    {
+        auto&& bgr = tgui::Panel::create();
+        bgr->getRenderer()->setTextureBackground(
+            TguiHelper::convertTexture(texture));
+        return priv::LayoutBuilderWithBackground(
+            bgr, buildProperties(sizer), sizer, strings);
+    }
 
-    priv::LayoutBuilderWithBackground withNoBackgroundImage();
+    priv::LayoutBuilderWithBackground withNoBackgroundImage()
+    {
+        return priv::LayoutBuilderWithBackground(
+            tgui::Group::create(), buildProperties(sizer), sizer, strings);
+    }
 
     // TODO: this
     priv::LayoutBuilderWithBackground withNoBackground();
 
 private:
-    static priv::BuilderProperties buildProperties(const Sizer& sizer);
+    static priv::BuilderProperties buildProperties(const Sizer& sizer)
+    {
+        const auto baseHeight = sizer.getBaseContainerHeight();
+
+        return priv::BuilderProperties {
+            .baseHeight = baseHeight,
+            .cornerButtonDimension = baseHeight * 2,
+            .cornerButtonPadding = baseHeight / 2,
+            .titleHeight = 3 * baseHeight,
+        };
+    }
 
 private:
     const Sizer& sizer;
+    const StringProvider<StringId>& strings;
 };
