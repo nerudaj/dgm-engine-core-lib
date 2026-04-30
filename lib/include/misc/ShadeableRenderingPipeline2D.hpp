@@ -9,7 +9,7 @@ public:
         const sf::Shader& shaderc,
         const std::optional<sf::BlendMode> mode = std::nullopt);
 
-    ShadeableRenderingPipeline2D(
+    explicit ShadeableRenderingPipeline2D(
         const sf::Texture& texture,
         const std::optional<sf::BlendMode> mode = std::nullopt);
 
