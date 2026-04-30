@@ -7,11 +7,13 @@
 #include <utility>
 #include <vector>
 
-using Localization = std::map<StringId, std::string_view>;
 using UnderlyingLanguageType = int;
 
 template<class E>
 concept ScopedEnum = std::is_scoped_enum_v<E>;
+
+template<ScopedEnum StringId>
+using Localization = std::map<StringId, std::string_view>;
 
 template<class E>
 concept LanguageEnum =
@@ -26,7 +28,8 @@ public:
 public:
     template<LanguageEnum Language>
     explicit StringProvider(
-        Language primary, const std::map<Language, Localization>& localizations)
+        Language primary,
+        const std::map<Language, Localization<StringId>>& localizations)
         : current(std::to_underlying(primary))
     {
         for (auto&& [language, localization] : localizations)
@@ -60,5 +63,5 @@ public:
 
 private:
     UnderlyingLanguageType current = {};
-    std::map<UnderlyingLanguageType, Localization> strings;
+    std::map<UnderlyingLanguageType, Localization<StringId>> strings;
 };

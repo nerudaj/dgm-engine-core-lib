@@ -2,6 +2,8 @@
 
 #include "gui/HeadingLevel.hpp"
 #include "gui/Sizers.hpp"
+#include "gui/TguiHelper.hpp"
+#include "gui/builders/WidgetBuilder.hpp"
 #include "strings/StringProvider.hpp"
 #include <TGUI/Backend/SFML-Graphics.hpp>
 #include <TGUI/TGUI.hpp>
@@ -213,7 +215,7 @@ public:
     }
 
 public:
-    priv::LayoutBuilderWithBackground
+    priv::LayoutBuilderWithBackground<StringId>
     withBackgroundImage(const sf::Texture& texture)
     {
         auto&& bgr = tgui::Panel::create();
@@ -223,14 +225,11 @@ public:
             bgr, buildProperties(sizer), sizer, strings);
     }
 
-    priv::LayoutBuilderWithBackground withNoBackgroundImage()
+    priv::LayoutBuilderWithBackground<StringId> withNoBackgroundImage()
     {
         return priv::LayoutBuilderWithBackground(
             tgui::Group::create(), buildProperties(sizer), sizer, strings);
     }
-
-    // TODO: this
-    priv::LayoutBuilderWithBackground withNoBackground();
 
 private:
     static priv::BuilderProperties buildProperties(const Sizer& sizer)
