@@ -27,32 +27,33 @@ public:
     GuiBuilderFactory(const GuiBuilderFactory&) = delete;
 
 public:
-    ButtonListBuilder<StringId> createButtonListBuilder() const
+    [[nodiscard]] ButtonListBuilder<StringId> createButtonListBuilder() const
     {
         return ButtonListBuilder(strings, sizer, audioPlayer);
     }
 
-    DefaultLayoutBuilder createDefaultLayoutBuiler() const
+    [[nodiscard]] DefaultLayoutBuilder createDefaultLayoutBuiler() const
     {
         return DefaultLayoutBuilder(sizer);
     }
 
-    FormBuilder<StringId> createFormBuilder() const
+    [[nodiscard]] FormBuilder<StringId> createFormBuilder() const
     {
         return FormBuilder(strings, sizer);
     }
 
-    NavbarLayoutBuilder createNavbarLayoutBuilder() const
+    [[nodiscard]] NavbarLayoutBuilder createNavbarLayoutBuilder() const
     {
         return NavbarLayoutBuilder(sizer);
     }
 
-    TabbedLayoutBuilder<StringId> createTabbedLayoutBuilder() const
+    [[nodiscard]] TabbedLayoutBuilder<StringId>
+    createTabbedLayoutBuilder() const
     {
         return TabbedLayoutBuilder(strings, sizer, audioPlayer);
     }
 
-    TableBuilder createTableBuilder() const
+    [[nodiscard]] TableBuilder createTableBuilder() const
     {
         return TableBuilder(sizer);
     }
