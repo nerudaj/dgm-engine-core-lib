@@ -16,7 +16,7 @@ namespace uni
     using namespace fmt;
 
     namespace views {
-        using ::ranges::views;
+        using namespace ::ranges::views;
     }
 
     namespace ranges 
