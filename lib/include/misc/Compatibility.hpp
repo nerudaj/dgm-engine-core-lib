@@ -4,15 +4,26 @@
 
 #ifdef ANDROID
 #include <fmt/core.h>
-#include <range/v3/range.hpp>
-#endif
-
-#ifdef ANDROID
-namespace uni = fmt;
-namespace uniranges = ranges;
+#include <range/v3/all.hpp>
 #else
+#include <format>
 #include <ranges>
-
-namespace uni = std;
-namespace uniranges = std::ranges;
 #endif
+
+namespace uni
+{
+    #ifdef ANDROID
+    using namespace fmt;
+
+    namespace views {
+        using ::ranges::views;
+    }
+
+    namespace ranges 
+    {
+        using namespace ::ranges;
+    }
+    #else
+    using namespace std;
+    #endif
+}

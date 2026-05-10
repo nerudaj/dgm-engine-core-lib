@@ -10,10 +10,10 @@
 {
     constexpr auto CHARS = std::string_view(
         "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-    return std::views::iota(0u, len)
-           | std::views::transform([CHARS](std::size_t)
+    return uni::views::iota(0u, len)
+           | uni::views::transform([CHARS](std::size_t)
                                    { return CHARS[rand() % CHARS.size()]; })
-           | uniranges::to<std::string>();
+           | uni::ranges::to<std::string>();
 }
 
 tgui::Label::Ptr WidgetBuilder::createLabelInternal(

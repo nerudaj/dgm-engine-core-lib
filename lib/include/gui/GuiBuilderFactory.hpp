@@ -32,7 +32,7 @@ public:
         return ButtonListBuilder(strings, sizer, audioPlayer);
     }
 
-    [[nodiscard]] DefaultLayoutBuilder createDefaultLayoutBuiler() const
+    [[nodiscard]] DefaultLayoutBuilder<StringId> createDefaultLayoutBuilder() const
     {
         return DefaultLayoutBuilder(sizer, strings);
     }
