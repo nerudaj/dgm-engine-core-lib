@@ -38,7 +38,7 @@ public:
     FormBuilder& addOptionWithWidgetId(
         const StringId labelId,
         tgui::Widget::Ptr widget,
-        const std::string widgetId)
+        const std::string& widgetId)
     {
         rowsToBuild.push_back(
             { .label = strings.getString(labelId),
