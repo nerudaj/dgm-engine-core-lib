@@ -58,15 +58,6 @@ public:
         return TableBuilder(sizer);
     }
 
-    tgui::Button::Ptr createTextButton(StringId textId, auto&& callback)
-    {
-        return WidgetBuilder::createButton(
-            strings.getString(textId),
-            std::forward<decltype(callback)>(callback),
-            sizer,
-            audioPlayer);
-    }
-
 private:
     const Sizer& sizer;
     const StringProvider<StringId>& strings;

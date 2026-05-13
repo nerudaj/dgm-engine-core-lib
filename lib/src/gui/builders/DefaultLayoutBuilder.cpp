@@ -6,6 +6,42 @@
 
 namespace priv
 {
+    static priv::BuilderProperties DefaultLayoutBuilderHelper::buildProperties(const Sizer& sizer)
+    {
+        const auto baseHeight = sizer.getBaseContainerHeight();
+
+        return priv::BuilderProperties {
+            .baseHeight = baseHeight,
+            .cornerButtonDimension = baseHeight * 2,
+            .cornerButtonPadding = baseHeight / 2,
+            .titleHeight = 3 * baseHeight,
+        };
+    }
+
+    tgui::Group::Ptr DefaultLayoutBuilderHelper::getContentLayout(const BuilderProperties& props)
+    {
+        auto&& layout = tgui::Group::create({
+            "70%",
+            uni::format(
+                "100% - {} - {} - {}",
+                props.titleHeight,
+                props.cornerButtonDimension,
+                props.cornerButtonPadding)
+                .c_str(),
+        });
+        layout->setPosition(
+            { "parent.width / 2 - width / 2", props.titleHeight });
+        return layout;
+    }
+
+    tgui::Group::Ptr DefaultLayoutBuilderHelper::getCornerButtonLayout(
+            const BuilderProperties& props,
+            tgui::HorizontalAlignment align,
+            tgui::VerticalAlignment valign)
+    {
+        // TODO: this
+    }
+
     static tgui::Container::Ptr containButton(
         tgui::Button::Ptr button,
         const BuilderProperties& props,
@@ -91,19 +127,6 @@ namespace priv
     LayoutBuilderWithContent LayoutBuilderWithBackgroundAndTitle::withContent(
         tgui::Container::Ptr content)
     {
-        auto&& contentPanel = tgui::Group::create({
-            "70%",
-            uni::format(
-                "100% - {} - {} - {}",
-                props.titleHeight,
-                props.cornerButtonDimension,
-                props.cornerButtonPadding)
-                .c_str(),
-        });
-        contentPanel->setPosition(
-            { "parent.width / 2 - width / 2", props.titleHeight });
-        contentPanel->add(content, "DefaultLayoutContentPanel");
-        container->add(contentPanel);
-        return LayoutBuilderWithContent(container, props);
+        
     }
 } // namespace priv

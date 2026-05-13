@@ -7,9 +7,44 @@
 #include "strings/StringProvider.hpp"
 #include <TGUI/Backend/SFML-Graphics.hpp>
 #include <TGUI/TGUI.hpp>
+#include "audio/GuiAudioInterface.hpp"
 
 namespace priv
 {
+    #define GENERATE_CORNER_BUTTON_METHODS(BuilderRtnType, methodName, align, valign) \
+    BuilderRtnType<StringId> \
+    methodName(StringId labelStringId, auto&& callback) \
+    { \
+        context.addLayoutedContainer( \
+            DefaultLayoutBuilderHelper::getCornerButtonLayout( \
+                context.props, \
+                align, \
+                valign), \
+            WidgetBuilder::createButton( \
+                context.strings.getString(labelStringId), \
+                std::forward<decltype(callback)>(callback), \
+                context.sizer, \
+                context.audioPlayer)); \
+        return LayoutBuilderWithContentAndOneButton(context); \
+    }
+
+    BuilderRtnType<StringId> methodName( \
+        const tgui::Texture::Ptr& texture, auto&& callback) \
+    { \
+        /* TODO: layout */ \
+        context.addLayoutedContainer( \
+            DefaultLayoutBuilderHelper::getCornerButtonLayout( \
+                context.props, \
+                align, \
+                valign), \
+            WidgetBuilder::createTexturedButton( \
+                texture, \
+                std::forward<decltype(callback)>(callback), \
+                context.sizer, \
+                context.audioPlayer)); \
+        return LayoutBuilderWithContentAndOneButton(context); \
+    }
+
     struct [[nodiscard]] BuilderProperties
     {
         unsigned baseHeight;
@@ -18,166 +53,211 @@ namespace priv
         unsigned titleHeight;
     };
 
+    template<ScopedEnum StringId>
+    struct [[nodiscard]] BuilderContext
+    {
+        Sizer &sizer;
+        StringProvider<StringId> &strings;
+        GuiAudioInterface &audioPlayer;
+        BuilderProperties props;
+        tgui::Container::Ptr content = tgui::Group::create();
+
+        void addLayoutedContainer(tgui::Container::Ptr layout, tgui::Container::Ptr container)
+        {
+            layout->add(container);
+            content->add(layout);
+        }
+    };
+
+    class [[nodiscard]] DefaultLayoutBuilderHelper final
+    {
+    public:
+        static priv::BuilderProperties buildProperties(const Sizer& sizer);
+        {
+            layout->add(container);
+            target->add(layout;)
+            return target;
+        }
+
+        static tgui::Container::Ptr getContentLayout(const BuilderProperties& props);
+
+        static tgui::Container::Ptr getCornerButtonLayout(
+            const BuilderProperties& props,
+            tgui::HorizontalAlignment align,
+            tgui::VerticalAlignment valign);
+    };
+
+    template<ScopedEnum StringId>
     class [[nodiscard]] FinalizedLayoutBuilder final
     {
     public:
-        FinalizedLayoutBuilder(
-            tgui::Container::Ptr container, const BuilderProperties& props)
-            : container(container), props(props)
+        FinalizedLayoutBuilder(const BuilderContext<StringId>& context)
+            : context(context)
         {
         }
 
     public:
         [[nodiscard]] inline tgui::Container::Ptr build() const
         {
-            return container;
+            return context.content;
         }
 
     private:
-        tgui::Container::Ptr container;
-        BuilderProperties props;
+        BuilderContext<StringId> context;
     };
 
+    template<ScopedEnum StringId>
     class [[nodiscard]] LayoutBuilderWithContentAndThreeButtons final
     {
     public:
-        LayoutBuilderWithContentAndThreeButtons(
-            tgui::Container::Ptr container, const BuilderProperties& props)
-            : container(container), props(props)
+        LayoutBuilderWithContentAndThreeButtons(const BuilderContext<StringId>& context)
+            : context(context)
         {
         }
 
     public:
-        FinalizedLayoutBuilder withNoBottomRightButton() const
+        FinalizedLayoutBuilder<String> withNoBottomRightButton() const
         {
-            return FinalizedLayoutBuilder(container, props);
+            return FinalizedLayoutBuilder(context);
         }
 
-        FinalizedLayoutBuilder withBottomRightButton(tgui::Button::Ptr button);
+        GENERATE_CORNER_BUTTON_METHODS(
+            FinalizedLayoutBuilder,
+            withBottomRightButton,
+            tgui::HorizontalAlignment::Right,
+            tgui::VerticalAlignment::Botton)
 
     private:
-        tgui::Container::Ptr container;
-        BuilderProperties props;
+        BuilderContext<StringId> context;
     };
 
+    template<ScopedEnum StringId>
     class [[nodiscard]] LayoutBuilderWithContentAndTwoButtons final
     {
     public:
-        LayoutBuilderWithContentAndTwoButtons(
-            tgui::Container::Ptr container, const BuilderProperties& props)
-            : container(container), props(props)
+        LayoutBuilderWithContentAndTwoButtons(const BuilderContext<StringId>& context)
+            : context(context)
         {
         }
 
     public:
-        LayoutBuilderWithContentAndThreeButtons withNoBottomLeftButton() const
+        LayoutBuilderWithContentAndThreeButtons<StringId> withNoBottomLeftButton() const
         {
-            return LayoutBuilderWithContentAndThreeButtons(container, props);
+            return LayoutBuilderWithContentAndThreeButtons(context);
         }
 
-        LayoutBuilderWithContentAndThreeButtons
-        withBottomLeftButton(tgui::Button::Ptr button);
+        GENERATE_CORNER_BUTTON_METHODS(
+            LayoutBuilderWithContentAndThreeButtons,
+            withBottomLeftButton,
+            tgui::HorizontalAlignment::Left,
+            tgui::VerticalAlignment::Botton)
 
     private:
-        tgui::Container::Ptr container;
-        BuilderProperties props;
+        BuilderContext<StringId> context;
     };
 
+    template<ScopedEnum StringId>
     class [[nodiscard]] LayoutBuilderWithContentAndOneButton final
     {
     public:
-        LayoutBuilderWithContentAndOneButton(
-            tgui::Container::Ptr container, const BuilderProperties& props)
-            : container(container), props(props)
+        LayoutBuilderWithContentAndOneButton(const BuilderContext<StringId>& context)
+            : context(context)
         {
         }
 
     public:
-        LayoutBuilderWithContentAndTwoButtons withNoTopRightButton() const
+        LayoutBuilderWithContentAndTwoButtons<StringId> withNoTopRightButton() const
         {
-            return LayoutBuilderWithContentAndTwoButtons(container, props);
+            return LayoutBuilderWithContentAndTwoButtons(context);
         }
 
-        LayoutBuilderWithContentAndTwoButtons
-        withTopRightButton(tgui::Button::Ptr button);
+        GENERATE_CORNER_BUTTON_METHODS(
+            LayoutBuilderWithContentAndTwoButtons,
+            withTopRightButton,
+            tgui::HorizontalAlignment::Right,
+            tgui::VerticalAlignment::Top)
 
     private:
-        tgui::Container::Ptr container;
-        BuilderProperties props;
+        BuilderContext<StringId> context;
     };
 
+    template<ScopedEnum StringId>
     class [[nodiscard]] LayoutBuilderWithContent final
     {
     public:
-        LayoutBuilderWithContent(
-            tgui::Container::Ptr container, const BuilderProperties& props)
-            : container(container), props(props)
+        LayoutBuilderWithContent(const BuilderContext<StringId>& context)
+            : context(context)
         {
         }
 
     public:
-        LayoutBuilderWithContentAndOneButton withNoTopLeftButton() const
+        LayoutBuilderWithContentAndOneButton<StringId> withNoTopLeftButton() const
         {
-            return LayoutBuilderWithContentAndOneButton(container, props);
+            return LayoutBuilderWithContentAndOneButton(context);
         }
 
-        LayoutBuilderWithContentAndOneButton
-        withTopLeftButton(tgui::Button::Ptr button);
+        GENERATE_CORNER_BUTTON_METHODS(
+            LayoutBuilderWithContentAndOneButton,
+            withTopLeftButton,
+            tgui::HorizontalAlignment::Left,
+            tgui::VerticalAlignment::Top)
 
-        FinalizedLayoutBuilder withNoCornerButtons()
+        FinalizedLayoutBuilder<StringId> withNoCornerButtons()
         {
-            return FinalizedLayoutBuilder(container, props);
+            return FinalizedLayoutBuilder(context);
         }
 
     private:
-        tgui::Container::Ptr container;
-        BuilderProperties props;
+        BuilderContext<StringId> context;
     };
 
+    template<ScopedEnum StringId>
     class [[nodiscard]] LayoutBuilderWithBackgroundAndTitle final
     {
     public:
-        LayoutBuilderWithBackgroundAndTitle(
-            tgui::Container::Ptr container, const BuilderProperties& props)
-            : container(container), props(props)
+        LayoutBuilderWithBackgroundAndTitle(const BuilderContext<StringId>& context)
+            : context(context)
         {
         }
 
     public:
-        LayoutBuilderWithContent withContent(tgui::Container::Ptr content);
+        LayoutBuilderWithContent<StringId> withContent(tgui::Container::Ptr content)
+        {
+            context.addLayoutedContainer(
+                DefaultLayoutBuilderHelper::getLayoutForContent(props)
+                content);
+            return LayoutBuilderWithContent<StringId>(context);
+        }
 
     private:
-        tgui::Container::Ptr container;
-        BuilderProperties props;
+        BuilderContext<StringId> context;
     };
 
     template<ScopedEnum StringId>
     class [[nodiscard]] LayoutBuilderWithBackground final
     {
     public:
-        LayoutBuilderWithBackground(
-            tgui::Container::Ptr container,
-            const BuilderProperties& props,
-            const Sizer& sizer,
-            const StringProvider<StringId>& strings)
-            : sizer(sizer), container(container), props(props), strings(strings)
+        LayoutBuilderWithBackground(const BuilderContext<StringId>& context)
+            : context(context)
         {
         }
 
     public:
-        LayoutBuilderWithBackgroundAndTitle
+        LayoutBuilderWithBackgroundAndTitle<StringId>
         withTitle(StringId stringId, HeadingLevel level)
         {
-            auto&& panel = tgui::Group::create({ "100%", props.titleHeight });
-            panel->add(WidgetBuilder::createHeading(
-                strings.getString(stringId), sizer, level));
-            container->add(panel);
-            return LayoutBuilderWithBackgroundAndTitle(container, props);
+            context.addLayoutedContainer(
+                tgui::Group::create({ "100%", props.titleHeight }),
+                WidgetBuilder::createHeading(
+                    strings.getString(stringId), sizer, level)));
+
+            return LayoutBuilderWithBackgroundAndTitle(context);
         }
 
-        LayoutBuilderWithBackgroundAndTitle
+        LayoutBuilderWithBackgroundAndTitle<StringId>
         withTexturedTitle(const sf::Texture& texture)
         {
+            // TODO: refactor
             tgui::Texture ttexture;
             ttexture.loadFromPixelData(
                 texture.getSize(), texture.copyToImage().getPixelsPtr());
@@ -191,16 +271,18 @@ namespace priv
             auto panel = tgui::Panel::create();
             panel->getRenderer()->setTextureBackground(ttexture);
 
-            container->add(panelContainer);
+            context.addLayoutedContainer(panelContainer, panel);
 
-            return LayoutBuilderWithBackgroundAndTitle(container, props);
+            return LayoutBuilderWithBackgroundAndTitle(context);
+        }
+
+        LayoutBuilderWithBackgroundAndTitle<StringId> withNoTitle()
+        {
+            return LayoutBuilderWithBackgroundAndTitle(context);
         }
 
     private:
-        const Sizer& sizer;
-        const StringProvider<StringId>& strings;
-        tgui::Container::Ptr container;
-        BuilderProperties props;
+        BuilderContext<StringId> context;
     };
 } // namespace priv
 
@@ -209,8 +291,15 @@ class [[nodiscard]] DefaultLayoutBuilder final
 {
 public:
     constexpr explicit DefaultLayoutBuilder(
-        const Sizer& sizer, const StringProvider<StringId>& strings) noexcept
-        : sizer(sizer), strings(strings)
+        const Sizer& sizer,
+        const StringProvider<StringId>& strings,
+        const GuiAudioInterface& audioPlayer) noexcept
+        : context({
+            .sizer = sizer,
+            .strings = strings,
+            .audioPlayer = audioPlayer,
+            .props = priv::DefaultLayoutBuilderHelper::(sizer),
+        })
     {
     }
 
@@ -218,33 +307,17 @@ public:
     priv::LayoutBuilderWithBackground<StringId>
     withBackgroundImage(const sf::Texture& texture)
     {
-        auto&& bgr = tgui::Panel::create();
-        bgr->getRenderer()->setTextureBackground(
+        context.content = tgui::Panel::create();
+        context.content->getRenderer()->setTextureBackground(
             TguiHelper::convertTexture(texture));
-        return priv::LayoutBuilderWithBackground(
-            bgr, buildProperties(sizer), sizer, strings);
+        return priv::LayoutBuilderWithBackground(context);
     }
 
-    priv::LayoutBuilderWithBackground<StringId> withNoBackgroundImage()
+    priv::LayoutBuilderWithBackground<StringId> withNoBackground()
     {
-        return priv::LayoutBuilderWithBackground(
-            tgui::Group::create(), buildProperties(sizer), sizer, strings);
+        return priv::LayoutBuilderWithBackground(context);
     }
 
 private:
-    static priv::BuilderProperties buildProperties(const Sizer& sizer)
-    {
-        const auto baseHeight = sizer.getBaseContainerHeight();
-
-        return priv::BuilderProperties {
-            .baseHeight = baseHeight,
-            .cornerButtonDimension = baseHeight * 2,
-            .cornerButtonPadding = baseHeight / 2,
-            .titleHeight = 3 * baseHeight,
-        };
-    }
-
-private:
-    const Sizer& sizer;
-    const StringProvider<StringId>& strings;
+    BuilderContext<StringId> context;
 };
