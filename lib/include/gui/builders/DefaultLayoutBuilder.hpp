@@ -279,6 +279,8 @@ namespace priv
     private:
         BuilderContext<StringId> context;
     };
+
+    #undef GENERATE_CORNER_BUTTON_METHODS
 } // namespace priv
 
 template<ScopedEnum StringId>
