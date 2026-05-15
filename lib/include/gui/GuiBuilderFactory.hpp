@@ -34,7 +34,7 @@ public:
 
     [[nodiscard]] DefaultLayoutBuilder<StringId> createDefaultLayoutBuilder() const
     {
-        return DefaultLayoutBuilder(sizer, strings);
+        return DefaultLayoutBuilder<StringId>(sizer, strings, audioPlayer);
     }
 
     [[nodiscard]] FormBuilder<StringId> createFormBuilder() const

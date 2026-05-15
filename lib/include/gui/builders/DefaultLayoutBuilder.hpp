@@ -25,13 +25,12 @@ namespace priv
                 std::forward<decltype(callback)>(callback), \
                 context.sizer, \
                 context.audioPlayer)); \
-        return LayoutBuilderWithContentAndOneButton(context); \
-    }
-
+        return BuilderRtnType(context); \
+    } \
+    \
     BuilderRtnType<StringId> methodName( \
-        const tgui::Texture::Ptr& texture, auto&& callback) \
+        const tgui::Texture& texture, auto&& callback) \
     { \
-        /* TODO: layout */ \
         context.addLayoutedContainer( \
             DefaultLayoutBuilderHelper::getCornerButtonLayout( \
                 context.props, \
@@ -42,7 +41,7 @@ namespace priv
                 std::forward<decltype(callback)>(callback), \
                 context.sizer, \
                 context.audioPlayer)); \
-        return LayoutBuilderWithContentAndOneButton(context); \
+        return BuilderRtnType(context); \
     }
 
     struct [[nodiscard]] BuilderProperties
@@ -56,13 +55,13 @@ namespace priv
     template<ScopedEnum StringId>
     struct [[nodiscard]] BuilderContext
     {
-        Sizer &sizer;
-        StringProvider<StringId> &strings;
+        const Sizer &sizer;
+        const StringProvider<StringId> &strings;
         GuiAudioInterface &audioPlayer;
         BuilderProperties props;
         tgui::Container::Ptr content = tgui::Group::create();
 
-        void addLayoutedContainer(tgui::Container::Ptr layout, tgui::Container::Ptr container)
+        void addLayoutedContainer(tgui::Container::Ptr layout, tgui::Widget::Ptr container)
         {
             layout->add(container);
             content->add(layout);
@@ -73,11 +72,6 @@ namespace priv
     {
     public:
         static priv::BuilderProperties buildProperties(const Sizer& sizer);
-        {
-            layout->add(container);
-            target->add(layout;)
-            return target;
-        }
 
         static tgui::Container::Ptr getContentLayout(const BuilderProperties& props);
 
@@ -85,6 +79,11 @@ namespace priv
             const BuilderProperties& props,
             tgui::HorizontalAlignment align,
             tgui::VerticalAlignment valign);
+
+        static tgui::Container::Ptr getTexturedTitleLayout(
+            const BuilderProperties& props,
+            const tgui::Texture& texture,
+            tgui::HorizontalAlignment align);
     };
 
     template<ScopedEnum StringId>
@@ -116,7 +115,7 @@ namespace priv
         }
 
     public:
-        FinalizedLayoutBuilder<String> withNoBottomRightButton() const
+        FinalizedLayoutBuilder<StringId> withNoBottomRightButton() const
         {
             return FinalizedLayoutBuilder(context);
         }
@@ -125,7 +124,7 @@ namespace priv
             FinalizedLayoutBuilder,
             withBottomRightButton,
             tgui::HorizontalAlignment::Right,
-            tgui::VerticalAlignment::Botton)
+            tgui::VerticalAlignment::Bottom)
 
     private:
         BuilderContext<StringId> context;
@@ -150,7 +149,7 @@ namespace priv
             LayoutBuilderWithContentAndThreeButtons,
             withBottomLeftButton,
             tgui::HorizontalAlignment::Left,
-            tgui::VerticalAlignment::Botton)
+            tgui::VerticalAlignment::Bottom)
 
     private:
         BuilderContext<StringId> context;
@@ -224,7 +223,7 @@ namespace priv
         LayoutBuilderWithContent<StringId> withContent(tgui::Container::Ptr content)
         {
             context.addLayoutedContainer(
-                DefaultLayoutBuilderHelper::getLayoutForContent(props)
+                DefaultLayoutBuilderHelper::getContentLayout(context.props),
                 content);
             return LayoutBuilderWithContent<StringId>(context);
         }
@@ -247,31 +246,27 @@ namespace priv
         withTitle(StringId stringId, HeadingLevel level)
         {
             context.addLayoutedContainer(
-                tgui::Group::create({ "100%", props.titleHeight }),
+                tgui::Group::create({ "100%", context.props.titleHeight }),
                 WidgetBuilder::createHeading(
-                    strings.getString(stringId), sizer, level)));
+                    context.strings.getString(stringId), context.sizer, level));
 
             return LayoutBuilderWithBackgroundAndTitle(context);
         }
 
         LayoutBuilderWithBackgroundAndTitle<StringId>
-        withTexturedTitle(const sf::Texture& texture)
+        withTexturedTitle(
+            const tgui::Texture& texture,
+            tgui::HorizontalAlignment align = tgui::HorizontalAlignment::Center)
         {
-            // TODO: refactor
-            tgui::Texture ttexture;
-            ttexture.loadFromPixelData(
-                texture.getSize(), texture.copyToImage().getPixelsPtr());
-
-            auto&& panelContainer = tgui::Group::create(
-                { texture.getSize().x * props.titleHeight / texture.getSize().y,
-                  props.titleHeight });
-            panelContainer->setPosition(
-                { "parent.width / 2 - width / 2", "0%" });
-
             auto panel = tgui::Panel::create();
-            panel->getRenderer()->setTextureBackground(ttexture);
+            panel->getRenderer()->setTextureBackground(texture);
 
-            context.addLayoutedContainer(panelContainer, panel);
+            context.addLayoutedContainer(
+                DefaultLayoutBuilderHelper::getTexturedTitleLayout(
+                    context.props,
+                    texture,
+                    align),
+                panel);
 
             return LayoutBuilderWithBackgroundAndTitle(context);
         }
@@ -290,26 +285,29 @@ template<ScopedEnum StringId>
 class [[nodiscard]] DefaultLayoutBuilder final
 {
 public:
-    constexpr explicit DefaultLayoutBuilder(
+    DefaultLayoutBuilder(
         const Sizer& sizer,
         const StringProvider<StringId>& strings,
-        const GuiAudioInterface& audioPlayer) noexcept
+        GuiAudioInterface& audioPlayer) noexcept
         : context({
             .sizer = sizer,
             .strings = strings,
             .audioPlayer = audioPlayer,
-            .props = priv::DefaultLayoutBuilderHelper::(sizer),
+            .props = priv::DefaultLayoutBuilderHelper::buildProperties(sizer),
         })
     {
     }
 
+    DefaultLayoutBuilder(DefaultLayoutBuilder&&) = default;
+    DefaultLayoutBuilder(const DefaultLayoutBuilder&) = delete;
+
 public:
     priv::LayoutBuilderWithBackground<StringId>
-    withBackgroundImage(const sf::Texture& texture)
+    withBackgroundImage(const tgui::Texture& texture)
     {
-        context.content = tgui::Panel::create();
-        context.content->getRenderer()->setTextureBackground(
-            TguiHelper::convertTexture(texture));
+        auto&& panel = tgui::Panel::create();
+        panel->getRenderer()->setTextureBackground(texture);
+        context.content = panel;
         return priv::LayoutBuilderWithBackground(context);
     }
 
@@ -319,5 +317,5 @@ public:
     }
 
 private:
-    BuilderContext<StringId> context;
+    priv::BuilderContext<StringId> context;
 };
