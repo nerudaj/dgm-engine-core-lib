@@ -34,7 +34,7 @@ public:
 
     [[nodiscard]] DefaultLayoutBuilder<StringId> createDefaultLayoutBuilder() const
     {
-        return DefaultLayoutBuilder(sizer, strings);
+        return DefaultLayoutBuilder<StringId>(sizer, strings, audioPlayer);
     }
 
     [[nodiscard]] FormBuilder<StringId> createFormBuilder() const
@@ -56,15 +56,6 @@ public:
     [[nodiscard]] TableBuilder createTableBuilder() const
     {
         return TableBuilder(sizer);
-    }
-
-    tgui::Button::Ptr createTextButton(StringId textId, auto&& callback)
-    {
-        return WidgetBuilder::createButton(
-            strings.getString(textId),
-            std::forward<decltype(callback)>(callback),
-            sizer,
-            audioPlayer);
     }
 
 private:
