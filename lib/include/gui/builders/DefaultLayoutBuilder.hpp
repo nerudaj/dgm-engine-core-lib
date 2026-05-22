@@ -1,5 +1,6 @@
 #pragma once
 
+#include "audio/GuiAudioInterface.hpp"
 #include "gui/HeadingLevel.hpp"
 #include "gui/Sizers.hpp"
 #include "gui/TguiHelper.hpp"
@@ -7,41 +8,36 @@
 #include "strings/StringProvider.hpp"
 #include <TGUI/Backend/SFML-Graphics.hpp>
 #include <TGUI/TGUI.hpp>
-#include "audio/GuiAudioInterface.hpp"
 
 namespace priv
 {
-    #define GENERATE_CORNER_BUTTON_METHODS(BuilderRtnType, methodName, align, valign) \
-    BuilderRtnType<StringId> \
-    methodName(StringId labelStringId, auto&& callback) \
-    { \
-        context.addLayoutedContainer( \
-            DefaultLayoutBuilderHelper::getCornerButtonLayout( \
-                context.props, \
-                align, \
-                valign), \
-            WidgetBuilder::createButton( \
-                context.strings.getString(labelStringId), \
-                std::forward<decltype(callback)>(callback), \
-                context.sizer, \
-                context.audioPlayer)); \
-        return BuilderRtnType(context); \
-    } \
-    \
-    BuilderRtnType<StringId> methodName( \
-        const tgui::Texture& texture, auto&& callback) \
-    { \
-        context.addLayoutedContainer( \
-            DefaultLayoutBuilderHelper::getCornerButtonLayout( \
-                context.props, \
-                align, \
-                valign), \
-            WidgetBuilder::createTexturedButton( \
-                texture, \
-                std::forward<decltype(callback)>(callback), \
-                context.sizer, \
-                context.audioPlayer)); \
-        return BuilderRtnType(context); \
+#define GENERATE_CORNER_BUTTON_METHODS(                                        \
+    BuilderRtnType, methodName, align, valign)                                 \
+    BuilderRtnType<StringId> methodName(                                       \
+        StringId labelStringId, auto&& callback)                               \
+    {                                                                          \
+        context.addLayoutedContainer(                                          \
+            DefaultLayoutBuilderHelper::getCornerButtonLayout(                 \
+                context.props, align, valign),                                 \
+            WidgetBuilder::createButton(                                       \
+                context.strings.getString(labelStringId),                      \
+                std::forward<decltype(callback)>(callback),                    \
+                context.sizer,                                                 \
+                context.audioPlayer));                                         \
+        return BuilderRtnType(context);                                        \
+    }                                                                          \
+                                                                               \
+    BuilderRtnType<StringId> methodName(                                       \
+        const tgui::Texture& texture, auto&& callback)                         \
+    {                                                                          \
+        context.addLayoutedContainer(                                          \
+            DefaultLayoutBuilderHelper::getCornerButtonLayout(                 \
+                context.props, align, valign),                                 \
+            WidgetBuilder::createTexturedButton(                               \
+                texture,                                                       \
+                std::forward<decltype(callback)>(callback),                    \
+                context.audioPlayer));                                         \
+        return BuilderRtnType(context);                                        \
     }
 
     struct [[nodiscard]] BuilderProperties
@@ -55,13 +51,14 @@ namespace priv
     template<ScopedEnum StringId>
     struct [[nodiscard]] BuilderContext
     {
-        const Sizer &sizer;
-        const StringProvider<StringId> &strings;
-        GuiAudioInterface &audioPlayer;
+        const Sizer& sizer;
+        const StringProvider<StringId>& strings;
+        GuiAudioInterface& audioPlayer;
         BuilderProperties props;
         tgui::Container::Ptr content = tgui::Group::create();
 
-        void addLayoutedContainer(tgui::Container::Ptr layout, tgui::Widget::Ptr container)
+        void addLayoutedContainer(
+            tgui::Container::Ptr layout, tgui::Widget::Ptr container)
         {
             layout->add(container);
             content->add(layout);
@@ -73,7 +70,8 @@ namespace priv
     public:
         static priv::BuilderProperties buildProperties(const Sizer& sizer);
 
-        static tgui::Container::Ptr getContentLayout(const BuilderProperties& props);
+        static tgui::Container::Ptr
+        getContentLayout(const BuilderProperties& props);
 
         static tgui::Container::Ptr getCornerButtonLayout(
             const BuilderProperties& props,
@@ -109,7 +107,8 @@ namespace priv
     class [[nodiscard]] LayoutBuilderWithContentAndThreeButtons final
     {
     public:
-        LayoutBuilderWithContentAndThreeButtons(const BuilderContext<StringId>& context)
+        LayoutBuilderWithContentAndThreeButtons(
+            const BuilderContext<StringId>& context)
             : context(context)
         {
         }
@@ -134,13 +133,15 @@ namespace priv
     class [[nodiscard]] LayoutBuilderWithContentAndTwoButtons final
     {
     public:
-        LayoutBuilderWithContentAndTwoButtons(const BuilderContext<StringId>& context)
+        LayoutBuilderWithContentAndTwoButtons(
+            const BuilderContext<StringId>& context)
             : context(context)
         {
         }
 
     public:
-        LayoutBuilderWithContentAndThreeButtons<StringId> withNoBottomLeftButton() const
+        LayoutBuilderWithContentAndThreeButtons<StringId>
+        withNoBottomLeftButton() const
         {
             return LayoutBuilderWithContentAndThreeButtons(context);
         }
@@ -159,13 +160,15 @@ namespace priv
     class [[nodiscard]] LayoutBuilderWithContentAndOneButton final
     {
     public:
-        LayoutBuilderWithContentAndOneButton(const BuilderContext<StringId>& context)
+        LayoutBuilderWithContentAndOneButton(
+            const BuilderContext<StringId>& context)
             : context(context)
         {
         }
 
     public:
-        LayoutBuilderWithContentAndTwoButtons<StringId> withNoTopRightButton() const
+        LayoutBuilderWithContentAndTwoButtons<StringId>
+        withNoTopRightButton() const
         {
             return LayoutBuilderWithContentAndTwoButtons(context);
         }
@@ -190,7 +193,8 @@ namespace priv
         }
 
     public:
-        LayoutBuilderWithContentAndOneButton<StringId> withNoTopLeftButton() const
+        LayoutBuilderWithContentAndOneButton<StringId>
+        withNoTopLeftButton() const
         {
             return LayoutBuilderWithContentAndOneButton(context);
         }
@@ -214,13 +218,15 @@ namespace priv
     class [[nodiscard]] LayoutBuilderWithBackgroundAndTitle final
     {
     public:
-        LayoutBuilderWithBackgroundAndTitle(const BuilderContext<StringId>& context)
+        LayoutBuilderWithBackgroundAndTitle(
+            const BuilderContext<StringId>& context)
             : context(context)
         {
         }
 
     public:
-        LayoutBuilderWithContent<StringId> withContent(tgui::Container::Ptr content)
+        LayoutBuilderWithContent<StringId>
+        withContent(tgui::Container::Ptr content)
         {
             context.addLayoutedContainer(
                 DefaultLayoutBuilderHelper::getContentLayout(context.props),
@@ -253,8 +259,7 @@ namespace priv
             return LayoutBuilderWithBackgroundAndTitle(context);
         }
 
-        LayoutBuilderWithBackgroundAndTitle<StringId>
-        withTexturedTitle(
+        LayoutBuilderWithBackgroundAndTitle<StringId> withTexturedTitle(
             const tgui::Texture& texture,
             tgui::HorizontalAlignment align = tgui::HorizontalAlignment::Center)
         {
@@ -263,9 +268,7 @@ namespace priv
 
             context.addLayoutedContainer(
                 DefaultLayoutBuilderHelper::getTexturedTitleLayout(
-                    context.props,
-                    texture,
-                    align),
+                    context.props, texture, align),
                 panel);
 
             return LayoutBuilderWithBackgroundAndTitle(context);
@@ -280,7 +283,7 @@ namespace priv
         BuilderContext<StringId> context;
     };
 
-    #undef GENERATE_CORNER_BUTTON_METHODS
+#undef GENERATE_CORNER_BUTTON_METHODS
 } // namespace priv
 
 template<ScopedEnum StringId>
@@ -292,11 +295,11 @@ public:
         const StringProvider<StringId>& strings,
         GuiAudioInterface& audioPlayer) noexcept
         : context({
-            .sizer = sizer,
-            .strings = strings,
-            .audioPlayer = audioPlayer,
-            .props = priv::DefaultLayoutBuilderHelper::buildProperties(sizer),
-        })
+              .sizer = sizer,
+              .strings = strings,
+              .audioPlayer = audioPlayer,
+              .props = priv::DefaultLayoutBuilderHelper::buildProperties(sizer),
+          })
     {
     }
 
