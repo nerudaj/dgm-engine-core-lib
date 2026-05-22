@@ -32,7 +32,7 @@ namespace priv
     {                                                                          \
         context.addLayoutedContainer(                                          \
             DefaultLayoutBuilderHelper::getCornerButtonLayout(                 \
-                context.props, align, valign),                                 \
+                context.props, align, valign, true),                                 \
             WidgetBuilder::createTexturedButton(                               \
                 texture,                                                       \
                 std::forward<decltype(callback)>(callback),                    \
@@ -76,7 +76,8 @@ namespace priv
         static tgui::Container::Ptr getCornerButtonLayout(
             const BuilderProperties& props,
             tgui::HorizontalAlignment align,
-            tgui::VerticalAlignment valign);
+            tgui::VerticalAlignment valign,
+            bool texturedButton = true);
 
         static tgui::Container::Ptr getTexturedTitleLayout(
             const BuilderProperties& props,
