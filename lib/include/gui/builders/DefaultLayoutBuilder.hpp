@@ -23,6 +23,7 @@ namespace priv
             WidgetBuilder::createButton( \
                 context.strings.getString(labelStringId), \
                 std::forward<decltype(callback)>(callback), \
+                context.sizer, \
                 context.audioPlayer)); \
         return BuilderRtnType(context); \
     } \
@@ -38,7 +39,6 @@ namespace priv
             WidgetBuilder::createTexturedButton( \
                 texture, \
                 std::forward<decltype(callback)>(callback), \
-                context.sizer, \
                 context.audioPlayer)); \
         return BuilderRtnType(context); \
     }
