@@ -23,7 +23,6 @@ namespace priv
             WidgetBuilder::createButton( \
                 context.strings.getString(labelStringId), \
                 std::forward<decltype(callback)>(callback), \
-                context.sizer, \
                 context.audioPlayer)); \
         return BuilderRtnType(context); \
     } \
