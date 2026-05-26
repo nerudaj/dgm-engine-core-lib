@@ -40,10 +40,14 @@ namespace priv
     tgui::Container::Ptr DefaultLayoutBuilderHelper::getCornerButtonLayout(
         const BuilderProperties& props,
         tgui::HorizontalAlignment align,
-        tgui::VerticalAlignment valign)
+        tgui::VerticalAlignment valign,
+        bool texturedButton)
     {
-        auto&& layout = tgui::Group::create(
-            { props.cornerButtonDimension, props.baseHeight });
+        auto&& layout = tgui::Group::create({
+            texturedButton
+                ? props.baseHeight
+                : props.cornerButtonDimension,
+            props.baseHeight });
         const auto&& xPos = [&]() -> std::string
         {
             if (align == tgui::HorizontalAlignment::Right)

@@ -70,7 +70,7 @@ public:
         const tgui::Texture& texture,
         std::function<void(void)> onClick,
         GuiAudioInterface& audioPlayer,
-        WidgetOptions options);
+        WidgetOptions options = WidgetOptions {});
 
     [[nodiscard]] static tgui::CheckBox::Ptr createCheckbox(
         bool checked,
