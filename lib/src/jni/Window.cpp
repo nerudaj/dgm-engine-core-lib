@@ -1,3 +1,5 @@
+#ifdef ANDROID
+
 #include "jni/Core.hpp"
 #include "jni/Window.hpp"
 
@@ -34,3 +36,5 @@ OperationResult jni::Window::enableImmesiveStickyMode() const
     env->CallVoidMethod(decorView, setSystemUiVisibility, flags);
     return OperationResult::Success;
 }
+
+#endif

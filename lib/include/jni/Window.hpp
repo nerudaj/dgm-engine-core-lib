@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef ANDROID
+
 #include "types/SemanticTypes.hpp"
 
 namespace jni
@@ -9,3 +11,5 @@ namespace jni
         OperationResult enableImmesiveStickyMode() const;
     };
 }
+
+#endif
