@@ -26,3 +26,9 @@ consteval bool operator""_false(const char*, size_t)
 auto v = 10_px_per_second;
 auto f = "disabled"_true;
 */
+
+enum class [[nodiscard]] OperationResult : bool
+{
+    Success = true,
+    Failure = false,
+};
