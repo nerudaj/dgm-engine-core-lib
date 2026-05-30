@@ -77,7 +77,7 @@ namespace priv
             const BuilderProperties& props,
             tgui::HorizontalAlignment align,
             tgui::VerticalAlignment valign,
-            bool texturedButton = true);
+            bool texturedButton = false);
 
         static tgui::Container::Ptr getTexturedTitleLayout(
             const BuilderProperties& props,
