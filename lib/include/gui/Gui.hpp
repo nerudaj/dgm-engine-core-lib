@@ -63,6 +63,11 @@ public:
         gui.setWindow(window);
     }
 
+    tgui::Gui& getTguiHandle()
+    {
+        return gui;
+    }
+
     void setFont(const tgui::Font& font)
     {
         gui.setFont(font);
