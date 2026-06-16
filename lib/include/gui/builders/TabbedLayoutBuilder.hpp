@@ -92,7 +92,12 @@ private:
     {
         if (isScrollable)
         {
-            return tgui::ScrollablePanel::create({ "100%", "100%" });
+            auto panel = tgui::ScrollablePanel::create({ "100%", "100%" });
+#ifdef ANDROID
+            panel->getRenderer()->setScrollbarWidth(
+                panel->getRenderer()->getScrollbarWidth() * 2.f);
+#endif
+            return panel;
         }
         return tgui::Panel::create({ "100%", "100%" });
     }
