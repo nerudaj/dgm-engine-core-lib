@@ -13,6 +13,8 @@ struct [[nodiscard]] TabbedLayoutOptions final
     std::optional<std::string> tabsWidgetId = std::nullopt;
     std::optional<std::string> contentWidgetId = std::nullopt;
     bool contentIsScrollable = false;
+    std::optional<std::string> contentClassName = std::nullopt;
+    std::optional<std::string> tabsClassName = std::nullopt;
 };
 
 /**
@@ -41,7 +43,8 @@ public:
 public:
     TabbedLayoutBuilder& addTab(
         const StringId stringId,
-        const std::function<void(tgui::Container::Ptr)> onTabSelected)
+        const std::function<void(tgui::Container::Ptr)> onTabSelected,
+        std::optional<std::string> className = std::nullopt)
     {
         const std::string tabName = strings.getString(stringId);
         tabNames.push_back(tabName);
@@ -58,7 +61,8 @@ public:
     [[nodiscard]] tgui::Container::Ptr
     build(const TabbedLayoutOptions& options = {})
     {
-        auto content = createContentPanel(options.contentIsScrollable);
+        auto content = createContentPanel(
+            options.contentIsScrollable, options.contentClassName, sizer);
         auto tabs = WidgetBuilder::createTabs(
             tabNames,
             [tabNames = tabNames,
@@ -77,6 +81,7 @@ public:
             audioPlayer,
             WidgetOptions {
                 .id = options.tabsWidgetId,
+                .className = options.tabsClassName,
             });
         tabs->select(selectedTab);
 
@@ -87,19 +92,33 @@ public:
     }
 
 private:
-    [[nodiscard]] static tgui::Container::Ptr
-    createContentPanel(bool isScrollable)
+    [[nodiscard]] static tgui::Container::Ptr createContentPanel(
+        bool isScrollable,
+        std::optional<std::string> className,
+        const Sizer& sizer)
     {
+        auto panel = [isScrollable = isScrollable]() -> tgui::Container::Ptr
+        {
+            if (isScrollable)
+                return tgui::ScrollablePanel::create({ "100%", "100%" });
+            return tgui::Panel::create({ "100%", "100%" });
+        }();
+
+        if (className)
+        {
+            panel->setRenderer(
+                tgui::Theme::getDefault()->getRenderer(*className));
+        }
+
+#ifdef ANDROID
         if (isScrollable)
         {
-            auto panel = tgui::ScrollablePanel::create({ "100%", "100%" });
-#ifdef ANDROID
-            panel->getRenderer()->setScrollbarWidth(
-                panel->getRenderer()->getScrollbarWidth() * 2.f);
-#endif
-            return panel;
+            panel->cast<tgui::ScrollablePanel>()
+                ->getRenderer()
+                ->setScrollbarWidth(sizer.getBaseFontSize());
         }
-        return tgui::Panel::create({ "100%", "100%" });
+#endif
+        return panel;
     }
 
 private:

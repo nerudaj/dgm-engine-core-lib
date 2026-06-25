@@ -79,7 +79,6 @@ tgui::Widget::Ptr priv::TableBuilder::build()
         auto&& color = rowIdx % 2 == 1 ? tgui::Color(128, 128, 128, 64)
                                        : tgui::Color::Transparent;
         auto&& rowWidget = WidgetBuilder::createRow(sizer);
-        addColoredBackground(rowWidget, color);
         rowWidget->setPosition({ "0%", rowWidget->getSize().y * rowIdx++ });
 
         if (row.empty()) // separator

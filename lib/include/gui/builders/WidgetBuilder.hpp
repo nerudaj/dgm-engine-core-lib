@@ -15,6 +15,9 @@ struct [[nodiscard]] WidgetOptions final
 {
     std::optional<std::string> id = std::nullopt;
     bool enabled = true;
+    std::optional<std::string> className =
+        std::nullopt; ///< Class name is a name of a custom renderer defined in
+                      ///< the Theme file
 };
 
 // https://github.com/llvm/llvm-project/issues/36032
@@ -160,6 +163,12 @@ private:
         if (options.id) widget->setWidgetName(options.id.value());
         widget->setEnabled(options.enabled);
         widget->getRenderer()->setOpacity(options.enabled ? 1.f : 0.5f);
+
+        if (options.className)
+        {
+            widget->setRenderer(
+                tgui::Theme::getDefault()->getRenderer(*options.className));
+        }
     }
 
     static void updateDropdownItems(

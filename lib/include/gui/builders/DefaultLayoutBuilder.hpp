@@ -32,7 +32,7 @@ namespace priv
     {                                                                          \
         context.addLayoutedContainer(                                          \
             DefaultLayoutBuilderHelper::getCornerButtonLayout(                 \
-                context.props, align, valign, true),                                 \
+                context.props, align, valign, true),                           \
             WidgetBuilder::createTexturedButton(                               \
                 texture,                                                       \
                 std::forward<decltype(callback)>(callback),                    \

@@ -71,6 +71,7 @@ tgui::Button::Ptr WidgetBuilder::createButton(
     button->setSize({ "90%", "90%" });
     button->setPosition({ "5%", "5%" });
     button->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
+    button->setTextSize(sizer.getBaseFontSize() * 0.75f);
 
     return button;
 }
@@ -103,7 +104,7 @@ tgui::CheckBox::Ptr WidgetBuilder::createCheckbox(
     auto&& checkbox = tgui::CheckBox::create();
     auto&& size = checkbox->getSizeLayout();
     checkbox->setSize({ "height", "parent.height" });
-    checkbox->setPosition({"parent.width / 2 - width / 2", "0%"});
+    checkbox->setPosition({ "parent.width / 2 - width / 2", "0%" });
     checkbox->setChecked(checked);
     checkbox->onChange(onChange);
 
