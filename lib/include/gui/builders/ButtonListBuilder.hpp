@@ -1,8 +1,8 @@
 #pragma once
 
 #include "audio/GuiAudioInterface.hpp"
-#include "gui/builders/WidgetBuilder.hpp"
 #include "gui/Sizers.hpp"
+#include "gui/builders/WidgetBuilder.hpp"
 #include "misc/Compatibility.hpp"
 #include "strings/StringProvider.hpp"
 #include <TGUI/Backend/SFML-Graphics.hpp>
@@ -10,6 +10,19 @@
 #include <functional>
 #include <string>
 #include <vector>
+
+struct [[nodiscard]] ButtonListOptions final
+{
+    tgui::HorizontalAlignment alignment = tgui::HorizontalAlignment::Center;
+    tgui::VerticalAlignment vAlignment = tgui::VerticalAlignment::Center;
+    std::string width =
+#ifdef ANDROID
+        "90%";
+#else
+        "50%";
+#endif
+    bool setFirstButtonFocused = true;
+};
 
 template<ScopedEnum StringId>
 class [[nodiscard]] ButtonListBuilder final
@@ -37,27 +50,23 @@ public:
         return *this;
     }
 
-    [[nodiscard]] tgui::Container::Ptr build(
-        tgui::HorizontalAlignment alignment = tgui::HorizontalAlignment::Center,
-        tgui::VerticalAlignment vAlignment = tgui::VerticalAlignment::Center)
+    [[nodiscard]] tgui::Container::Ptr build(ButtonListOptions options = {})
     {
-        auto&& layout = tgui::GrowVerticalLayout::create();
-#ifdef ANDROID
-        layout->setSize({ "90%", "100%" });
-#else
-        layout->setSize({ "50%", "100%" });
-#endif
+        auto&& layout =
+            tgui::GrowVerticalLayout::create({ options.width.c_str(), "100%" });
 
         const std::string& horizontalPosition = [&]
         {
-            if (alignment == tgui::HorizontalAlignment::Center)
+            if (options.alignment == tgui::HorizontalAlignment::Center)
                 return "parent.width / 2 - width / 2";
-            else if (alignment == tgui::HorizontalAlignment::Right)
+            else if (options.alignment == tgui::HorizontalAlignment::Right)
                 return "parent.width - width";
             return "0%";
         }();
         layout->getRenderer()->setSpaceBetweenWidgets(
             static_cast<float>(sizer.getBaseFontSize()));
+
+        std::vector<tgui::Button::Ptr> buttons;
 
         for (auto&& [idx, props] : std::views::enumerate(buttonProps))
         {
@@ -68,13 +77,22 @@ public:
             group->add(button, props.buttonId);
 
             layout->add(group);
+            buttons.push_back(button);
         }
+
+        // Configure navigation and set first button focused
+        for (size_t idx = 1u; idx < buttons.size() - 1; ++idx)
+        {
+            buttons[idx - 1]->setNavigationDown(buttons[idx]);
+            buttons[idx]->setNavigationUp(buttons[idx - 1]);
+        }
+        buttons.front()->setFocused(options.setFirstButtonFocused);
 
         const std::string& verticalPosition = [&]
         {
-            if (vAlignment == tgui::VerticalAlignment::Center)
+            if (options.vAlignment == tgui::VerticalAlignment::Center)
                 return "parent.height / 2 - height / 2";
-            else if (vAlignment == tgui::VerticalAlignment::Bottom)
+            else if (options.vAlignment == tgui::VerticalAlignment::Bottom)
                 return "parent.height - height";
             return "0%";
         }();
