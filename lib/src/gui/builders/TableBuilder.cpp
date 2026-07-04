@@ -39,15 +39,6 @@ createCell(const tgui::Widget::Ptr& content, size_t column, size_t totalColumns)
     return cell;
 }
 
-static void
-addColoredBackground(tgui::Container::Ptr& container, const tgui::Color& color)
-{
-    auto panel = tgui::Panel::create();
-    panel->getRenderer()->setBorders(0);
-    panel->getRenderer()->setBackgroundColor(color);
-    container->add(panel);
-}
-
 tgui::Widget::Ptr priv::TableBuilder::build()
 {
     auto&& panel = tgui::GrowVerticalLayout::create();
@@ -76,8 +67,6 @@ tgui::Widget::Ptr priv::TableBuilder::build()
 
     for (auto&& row : rowsOfCells)
     {
-        auto&& color = rowIdx % 2 == 1 ? tgui::Color(128, 128, 128, 64)
-                                       : tgui::Color::Transparent;
         auto&& rowWidget = WidgetBuilder::createRow(sizer);
         rowWidget->setPosition({ "0%", rowWidget->getSize().y * rowIdx++ });
 

@@ -3,5 +3,6 @@
 enum class [[nodiscard]] HeadingLevel
 {
     H1,
-    H2
+    H2,
+    Regular,
 };

@@ -39,7 +39,7 @@ public:
     [[nodiscard]] static inline tgui::Label::Ptr createTextLabel(
         const std::string& text, const Sizer& sizer, bool justify = false)
     {
-        return createLabelInternal(text, 1.f, sizer, justify);
+        return createLabelInternal(text, HeadingLevel::Regular, sizer, justify);
     }
 
     [[nodiscard]] static inline tgui::Label::Ptr createHeading(
@@ -48,7 +48,7 @@ public:
         HeadingLevel level = HeadingLevel::H1)
     {
         return createLabelInternal(
-            text, level == HeadingLevel::H1 ? 4.f : 2.f, sizer, true);
+            text, level, sizer, true);
     }
 
     [[nodiscard]] static tgui::Container::Ptr createRow(const Sizer& sizer);
@@ -153,7 +153,7 @@ public:
 private:
     [[nodiscard]] static tgui::Label::Ptr createLabelInternal(
         const std::string& text,
-        const float sizeMultiplier,
+    const HeadingLevel& level,
         const Sizer& sizer,
         const bool justify = false);
 

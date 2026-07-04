@@ -18,7 +18,7 @@
 
 tgui::Label::Ptr WidgetBuilder::createLabelInternal(
     const std::string& text,
-    const float sizeMultiplier,
+    const HeadingLevel& level,
     const Sizer& sizer,
     const bool justify)
 {
@@ -27,8 +27,7 @@ tgui::Label::Ptr WidgetBuilder::createLabelInternal(
     label->setHorizontalAlignment(
         justify ? tgui::HorizontalAlignment::Center
                 : tgui::HorizontalAlignment::Left);
-    label->setTextSize(
-        static_cast<unsigned>(sizer.getBaseFontSize() * sizeMultiplier));
+    label->setTextSize(sizer.getFontSize(level));
     label->setSize({ "100%", "100%" });
     return label;
 }
@@ -102,7 +101,6 @@ tgui::CheckBox::Ptr WidgetBuilder::createCheckbox(
     bool checked, std::function<void(bool)> onChange, WidgetOptions options)
 {
     auto&& checkbox = tgui::CheckBox::create();
-    auto&& size = checkbox->getSizeLayout();
     checkbox->setSize({ "height", "parent.height" });
     checkbox->setPosition({ "parent.width / 2 - width / 2", "0%" });
     checkbox->setChecked(checked);

@@ -144,5 +144,29 @@ unsigned Sizer::getBaseFontSize() const
 #else
     const auto size = getBaseContainerHeight() / CONTAINER_PADDING_MULTIPLIER;
 #endif
-    return static_cast<float>(size * scale);
+    return static_cast<unsigned>(size * scale);
+}
+
+unsigned Sizer::getFontSize(HeadingLevel level) const
+{
+    return static_cast<unsigned>(getBaseFontSize() * getSizeMultiplier(level));
+}
+
+unsigned Sizer::getContainerHeight(HeadingLevel level) const
+{
+    return static_cast<unsigned>(
+        getBaseContainerHeight() * getSizeMultiplier(level));
+}
+
+float Sizer::getSizeMultiplier(HeadingLevel level) const
+{
+    switch (level)
+    {
+    case HeadingLevel::H1:
+        return 4.f;
+    case HeadingLevel::H2:
+        return 2.f;
+    default:
+        return 1.f;
+    }
 }
