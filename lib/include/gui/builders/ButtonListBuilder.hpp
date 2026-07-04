@@ -52,8 +52,7 @@ public:
 
     [[nodiscard]] tgui::Container::Ptr build(ButtonListOptions options = {})
     {
-        auto&& layout =
-            tgui::GrowVerticalLayout::create({ options.width.c_str(), "100%" });
+        auto&& layout = tgui::GrowVerticalLayout::create(options.width.c_str());
 
         const std::string& horizontalPosition = [&]
         {
