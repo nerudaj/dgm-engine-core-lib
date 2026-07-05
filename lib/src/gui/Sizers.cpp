@@ -163,9 +163,9 @@ float Sizer::getSizeMultiplier(HeadingLevel level) const
     switch (level)
     {
     case HeadingLevel::H1:
-        return 4.f;
-    case HeadingLevel::H2:
         return 2.f;
+    case HeadingLevel::H2:
+        return 1.5f;
     default:
         return 1.f;
     }

@@ -9,24 +9,21 @@ class TguiHelper final
 {
 public:
     [[nodiscard]] static tgui::Texture
-    convertTexture(const sf::Texture& texture)
-    {
-        auto result = tgui::Texture();
-        result.loadFromPixelData(
-            texture.getSize(), texture.copyToImage().getPixelsPtr());
-        return result;
-    }
+    convertTexture(const sf::Texture& texture);
 
     [[nodiscard]] static tgui::Texture
-    convertTexture(const sf::Texture& texture, const sf::IntRect& clipping)
+    convertTexture(const sf::Texture& texture, const sf::IntRect& clipping);
+
+    static void alignInParent(
+        tgui::Container::Ptr container,
+        tgui::HorizontalAlignment align,
+        tgui::VerticalAlignment valign);
+
+    static inline void centerInParent(tgui::Container::Ptr container)
     {
-        auto result = tgui::Texture();
-        result.loadFromPixelData(
-            texture.getSize(),
-            texture.copyToImage().getPixelsPtr(),
-            tgui::UIntRect(
-                tgui::Vector2u(clipping.position.x, clipping.position.y),
-                tgui::Vector2u(clipping.size.x, clipping.size.y)));
-        return result;
+        alignInParent(
+            container,
+            tgui::HorizontalAlignment::Center,
+            tgui::VerticalAlignment::Center);
     }
 };

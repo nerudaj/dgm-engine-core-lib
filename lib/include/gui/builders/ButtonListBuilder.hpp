@@ -2,6 +2,7 @@
 
 #include "audio/GuiAudioInterface.hpp"
 #include "gui/Sizers.hpp"
+#include "gui/TguiHelper.hpp"
 #include "gui/builders/WidgetBuilder.hpp"
 #include "misc/Compatibility.hpp"
 #include "strings/StringProvider.hpp"
@@ -53,15 +54,6 @@ public:
     [[nodiscard]] tgui::Container::Ptr build(ButtonListOptions options = {})
     {
         auto&& layout = tgui::GrowVerticalLayout::create(options.width.c_str());
-
-        const std::string& horizontalPosition = [&]
-        {
-            if (options.alignment == tgui::HorizontalAlignment::Center)
-                return "parent.width / 2 - width / 2";
-            else if (options.alignment == tgui::HorizontalAlignment::Right)
-                return "parent.width - width";
-            return "0%";
-        }();
         layout->getRenderer()->setSpaceBetweenWidgets(
             static_cast<float>(sizer.getBaseFontSize()));
 
@@ -87,17 +79,8 @@ public:
         }
         buttons.front()->setFocused(options.setFirstButtonFocused);
 
-        const std::string& verticalPosition = [&]
-        {
-            if (options.vAlignment == tgui::VerticalAlignment::Center)
-                return "parent.height / 2 - height / 2";
-            else if (options.vAlignment == tgui::VerticalAlignment::Bottom)
-                return "parent.height - height";
-            return "0%";
-        }();
-
-        layout->setPosition(
-            { horizontalPosition.c_str(), verticalPosition.c_str() });
+        TguiHelper::alignInParent(
+            layout, options.alignment, options.vAlignment);
 
         return layout;
     }

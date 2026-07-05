@@ -3,9 +3,11 @@
 #include "audio/GuiAudioInterface.hpp"
 #include "gui/Sizers.hpp"
 #include "gui/builders/WidgetBuilder.hpp"
+#include "gui/TguiHelper.hpp"
 #include "strings/StringProvider.hpp"
 #include <TGUI/Backend/SFML-Graphics.hpp>
 #include <TGUI/TGUI.hpp>
+#include <types/SemanticTypes.hpp>
 
 namespace priv
 {
@@ -30,19 +32,19 @@ namespace priv
             const Sizer& sizer,
             const HeadingLevel level,
             const std::optional<std::string> panelClassName = std::nullopt);
-        
+
         static tgui::Container::Ptr createContentContainer(
             const Sizer& sizer,
-            const unisgned titleHeight,
+            const unsigned titleHeight,
             tgui::Container::Ptr actualContent);
-        
+
         static tgui::Container::Ptr createBottomButton(
             const std::string& string,
             std::function<void()>&& callback,
             const WidgetOptions& options,
             const tgui::HorizontalAlignment alignment,
             const Sizer& sizer,
-            const GuiAudioInterface& audioPlayer,
+            GuiAudioInterface& audioPlayer,
             const std::optional<std::string> widthOverride);
     };
 
@@ -50,8 +52,11 @@ namespace priv
     class [[nodiscard]] SimpleLayoutFinalBuilder final
     {
     public:
-        SimpleLayoutFinalBuilder(const SimpleLayoutBuilderContext<StringId>& context)
-        : context(context) {}
+        SimpleLayoutFinalBuilder(
+            const SimpleLayoutBuilderContext<StringId>& context)
+            : context(context)
+        {
+        }
 
     public:
         tgui::Container::Ptr build()
@@ -67,16 +72,19 @@ namespace priv
     class [[nodiscard]] SimpleLayoutWithLeftButtonBuilder final
     {
     public:
-        SimpleLayoutWithLeftButtonBuilder(const SimpleLayoutBuilderContext<StringId>& context)
-        : context(context) {}
+        SimpleLayoutWithLeftButtonBuilder(
+            const SimpleLayoutBuilderContext<StringId>& context)
+            : context(context)
+        {
+        }
 
     public:
-        SimpleLayoutFinalBuilder<StringId> withNoBottomLeftButton()
+        SimpleLayoutFinalBuilder<StringId> withNoBottomRightButton()
         {
             return SimpleLayoutFinalBuilder<StringId>(context);
         }
 
-        SimpleLayoutFinalBuilder<StringId> withButtonLeftButton(
+        SimpleLayoutFinalBuilder<StringId> withBottomRightButton(
             StringId stringId,
             std::function<void()>&& callback,
             const WidgetOptions options = {},
@@ -101,8 +109,11 @@ namespace priv
     class [[nodiscard]] SimpleLayoutWithContentBuilder final
     {
     public:
-        SimpleLayoutWithContentBuilder(const SimpleLayoutBuilderContext<StringId>& context)
-        : context(context) {}
+        SimpleLayoutWithContentBuilder(
+            const SimpleLayoutBuilderContext<StringId>& context)
+            : context(context)
+        {
+        }
 
     public:
         SimpleLayoutFinalBuilder<StringId> withNoBottomButtons()
@@ -115,7 +126,7 @@ namespace priv
             return SimpleLayoutWithLeftButtonBuilder<StringId>(context);
         }
 
-        SimpleLayoutWithLeftButtonBuilder<StringId> withButtonLeftButton(
+        SimpleLayoutWithLeftButtonBuilder<StringId> withBottomLeftButton(
             StringId stringId,
             std::function<void()>&& callback,
             const WidgetOptions options = {},
@@ -140,16 +151,18 @@ namespace priv
     class [[nodiscard]] SimpleLayoutWithTitleBuilder final
     {
     public:
-        SimpleLayoutWithTitleBuilder(const SimpleLayoutBuilderContext<StringId>& context)
-        : context(context) {}
+        SimpleLayoutWithTitleBuilder(
+            const SimpleLayoutBuilderContext<StringId>& context)
+            : context(context)
+        {
+        }
 
     public:
-        SimpleLayoutWithContentBuilder<StringId> withContent(tgui::Container::Ptr content)
+        SimpleLayoutWithContentBuilder<StringId>
+        withContent(tgui::Container::Ptr content)
         {
             context.root->add(SimpleLayoutBuilderHelper::createContentContainer(
-                context.sizer,
-                context.titleHeight,
-                content));
+                context.sizer, context.titleHeight, content));
             return SimpleLayoutWithContentBuilder<StringId>(context);
         }
 
@@ -161,8 +174,11 @@ namespace priv
     class [[nodiscard]] SimpleLayoutWithBackgroundBuilder final
     {
     public:
-        SimpleLayoutWithBackgroundBuilder(const SimpleLayoutBuilderContext<StringId>& context)
-        : context(context) {}
+        SimpleLayoutWithBackgroundBuilder(
+            const SimpleLayoutBuilderContext<StringId>& context)
+            : context(context)
+        {
+        }
 
     public:
         SimpleLayoutWithTitleBuilder<StringId> withNoTitle()
@@ -171,8 +187,7 @@ namespace priv
         }
 
         SimpleLayoutWithTitleBuilder<StringId> withTexturedTitle(
-            const tgui::Texture& texture,
-            const HeadingLevel level)
+            const tgui::Texture& texture, const HeadingLevel level)
         {
             auto panel = Helper::createTitleContainer(context.sizer, level);
             panel->getRenderer()->setTextureBackground(texture);
@@ -181,9 +196,10 @@ namespace priv
         }
 
         SimpleLayoutWithTitleBuilder<StringId> withTitleInPanel(
-            StringId stringId, 
+            StringId stringId,
             const HeadingLevel level,
-            tgui::HorizontalAlignment titleAlignment = tgui::HorizontalAlignment::Center,
+            tgui::HorizontalAlignment titleAlignment =
+                tgui::HorizontalAlignment::Center,
             std::optional<std::string> panelClassName = std::nullopt)
         {
             return withTitle(
@@ -195,9 +211,10 @@ namespace priv
         }
 
         SimpleLayoutWithTitleBuilder<StringId> withPlainTitle(
-            StringId stringId, 
+            StringId stringId,
             const HeadingLevel level,
-            tgui::HorizontalAlignment titleAlignment = tgui::HorizontalAlignment::Center)
+            tgui::HorizontalAlignment titleAlignment =
+                tgui::HorizontalAlignment::Center)
         {
             return withTitle(
                 stringId,
@@ -209,25 +226,39 @@ namespace priv
 
     private:
         SimpleLayoutWithTitleBuilder<StringId> withTitle(
-            StringId stringId, 
+            StringId stringId,
             const HeadingLevel level,
             tgui::HorizontalAlignment titleAlignment,
             bool usePanel,
             std::optional<std::string> panelClassName)
         {
             auto panel = Helper::createTitleContainer(
-                context.sizer,
-                level,
-                usePanel,
-                panelClassName);
+                usePanel, context.sizer, level, panelClassName);
             context.root->add(panel);
-            
-            panel->add(WidgetBuilder::createHeading(
+
+            auto label = WidgetBuilder::createHeading(
                 context.strings.getString(stringId),
                 context.sizer,
                 level,
-                titleAlignment));
-            context.titleHeight = sizer.getContainerHeight(level);
+                titleAlignment);
+            
+            if (usePanel)
+            {
+                auto innerLayout = tgui::Group::create({
+                    uni::format(
+                        "100% - 2 * {}", context.sizer.getBaseFontSize())
+                        .c_str(),
+                    "100%",
+                });
+                TguiHelper::centerInParent(innerLayout);
+                panel->add(innerLayout);
+                innerLayout->add(label);
+            }
+            else
+            {
+                panel->add(label);
+            }
+            context.titleHeight = context.sizer.getContainerHeight(level);
 
             return SimpleLayoutWithTitleBuilder<StringId>(context);
         }
@@ -237,7 +268,7 @@ namespace priv
 
         SimpleLayoutBuilderContext<StringId> context;
     };
-}
+} // namespace priv
 
 /**
  *  Simplified and slightly reworked version of DefaultLayoutBuilder
@@ -250,16 +281,18 @@ class [[nodiscard]] SimpleLayoutBuilder final
 {
 public:
     SimpleLayoutBuilder(
-        const Sizer& sizer, 
+        const Sizer& sizer,
         const StringProvider<StringId>& strings,
         GuiAudioInterface& audioPlayer)
         : context({
-            .sizer = sizer,
-            .strings = strings,
-            .audioPlayer = audioPlayer,
-            .root = priv::SimpleLayoutBuilderHelper::createRootContainer(sizer),
-        })
-    {}
+              .sizer = sizer,
+              .strings = strings,
+              .audioPlayer = audioPlayer,
+              .root =
+                  priv::SimpleLayoutBuilderHelper::createRootContainer(sizer),
+          })
+    {
+    }
 
 public:
     priv::SimpleLayoutWithBackgroundBuilder<StringId>
@@ -271,12 +304,11 @@ public:
         return priv::SimpleLayoutWithBackgroundBuilder<StringId>(context);
     }
 
-    priv::SimpleLayoutWithBackgroundBuilder<StringId>
-    withNoBackground()
+    priv::SimpleLayoutWithBackgroundBuilder<StringId> withNoBackground()
     {
         return priv::SimpleLayoutWithBackgroundBuilder<StringId>(context);
     }
 
 private:
-    SimpleLayoutBuilderContext<StringId> context;
+    priv::SimpleLayoutBuilderContext<StringId> context;
 };

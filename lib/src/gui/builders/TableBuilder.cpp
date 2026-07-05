@@ -5,16 +5,18 @@
 #include <cassert>
 #include <ranges>
 
-void priv::TableBuilder::addRow(const std::vector<tgui::Widget::Ptr>& cells)
+priv::TableBuilder& priv::TableBuilder::addRow(const std::vector<tgui::Widget::Ptr>& cells)
 {
     assert(!heading || heading->size() == cells.size());
     assert(rowsOfCells.empty() || rowsOfCells.front().size() == cells.size());
     rowsOfCells.push_back(cells);
+    return *this;
 }
 
-void priv::TableBuilder::addSeparator()
+priv::TableBuilder& priv::TableBuilder::addSeparator()
 {
     rowsOfCells.push_back({});
+    return *this;
 }
 
 template<class Range>
@@ -39,7 +41,7 @@ createCell(const tgui::Widget::Ptr& content, size_t column, size_t totalColumns)
     return cell;
 }
 
-tgui::Widget::Ptr priv::TableBuilder::build()
+tgui::Container::Ptr priv::TableBuilder::build()
 {
     auto&& panel = tgui::GrowVerticalLayout::create();
 

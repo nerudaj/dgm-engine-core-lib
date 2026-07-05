@@ -23,11 +23,11 @@ namespace priv
         {
         }
 
-        void addRow(const std::vector<tgui::Widget::Ptr>& cells);
+        TableBuilder& addRow(const std::vector<tgui::Widget::Ptr>& cells);
 
-        void addSeparator();
+        TableBuilder& addSeparator();
 
-        [[nodiscard]] tgui::Widget::Ptr build();
+        [[nodiscard]] tgui::Container::Ptr build();
 
     private:
         const Sizer& sizer;
