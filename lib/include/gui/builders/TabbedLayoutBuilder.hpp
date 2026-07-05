@@ -97,7 +97,7 @@ private:
         std::optional<std::string> className,
         const Sizer& sizer)
     {
-        auto panel = [isScrollable = isScrollable]() -> tgui::Container::Ptr
+        auto panel = [isScrollable = isScrollable, &sizer]() -> tgui::Container::Ptr
         {
             if (isScrollable)
             {

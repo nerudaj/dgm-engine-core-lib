@@ -39,16 +39,22 @@ public:
     [[nodiscard]] static inline tgui::Label::Ptr createTextLabel(
         const std::string& text, const Sizer& sizer, bool justify = false)
     {
-        return createLabelInternal(text, HeadingLevel::Regular, sizer, justify);
+        return createLabelInternal(
+            text,
+            HeadingLevel::Regular,
+            sizer,
+            justify ? tgui::HorizontalAlignment::Center
+                    : tgui::HorizontalAlignment::Left);
     }
 
     [[nodiscard]] static inline tgui::Label::Ptr createHeading(
         const std::string& text,
         const Sizer& sizer,
-        HeadingLevel level = HeadingLevel::H1)
+        HeadingLevel level = HeadingLevel::H1,
+        tgui::HorizontalAlignment alignment = tgui::HorizontalAlignment::Center)
     {
         return createLabelInternal(
-            text, level, sizer, true);
+            text, level, sizer, alignment);
     }
 
     [[nodiscard]] static tgui::Container::Ptr createRow(const Sizer& sizer);
@@ -153,9 +159,9 @@ public:
 private:
     [[nodiscard]] static tgui::Label::Ptr createLabelInternal(
         const std::string& text,
-    const HeadingLevel& level,
+        const HeadingLevel& level,
         const Sizer& sizer,
-        const bool justify = false);
+        tgui::HorizontalAlignment alignment);
 
     static void
     applyOptionsToWidget(WidgetOptions options, tgui::Widget::Ptr widget)

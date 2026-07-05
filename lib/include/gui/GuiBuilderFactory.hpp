@@ -6,6 +6,7 @@
 #include "gui/builders/DefaultLayoutBuilder.hpp"
 #include "gui/builders/FormBuilder.hpp"
 #include "gui/builders/NavbarLayoutBuilder.hpp"
+#include "gui/builders/SimpleLayoutBuilder.hpp"
 #include "gui/builders/TabbedLayoutBuilder.hpp"
 #include "gui/builders/TableBuilder.hpp"
 #include "gui/builders/WidgetBuilder.hpp"
@@ -35,6 +36,11 @@ public:
     [[nodiscard]] DefaultLayoutBuilder<StringId> createDefaultLayoutBuilder() const
     {
         return DefaultLayoutBuilder<StringId>(sizer, strings, audioPlayer);
+    }
+
+    [[nodiscard]] SimpleLayoutBuilder<StringId> createSimpleLayoutBuilder() const
+    {
+        return SimpleLayoutBuilder<StringId>(sizer, strings, audioPlayer);
     }
 
     [[nodiscard]] FormBuilder<StringId> createFormBuilder() const

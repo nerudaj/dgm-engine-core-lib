@@ -20,13 +20,11 @@ tgui::Label::Ptr WidgetBuilder::createLabelInternal(
     const std::string& text,
     const HeadingLevel& level,
     const Sizer& sizer,
-    const bool justify)
+    tgui::HorizontalAlignment alignment)
 {
     auto&& label = tgui::Label::create(text);
     label->setVerticalAlignment(tgui::VerticalAlignment::Center);
-    label->setHorizontalAlignment(
-        justify ? tgui::HorizontalAlignment::Center
-                : tgui::HorizontalAlignment::Left);
+    label->setHorizontalAlignment(alignment);
     label->setTextSize(sizer.getFontSize(level));
     label->setSize({ "100%", "100%" });
     return label;
