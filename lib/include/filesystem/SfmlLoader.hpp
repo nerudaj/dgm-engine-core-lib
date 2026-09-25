@@ -38,7 +38,8 @@ public:
         }
         catch (const std::exception& ex)
         {
-            return std::unexpected { dgm::Error(ex.what()) };
+            return std::unexpected { dgm::Error(
+                std::string(ex.what()) + " with path: " + path.string()) };
         }
     }
 
