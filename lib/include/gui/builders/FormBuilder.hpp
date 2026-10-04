@@ -25,13 +25,21 @@ public:
     ~FormBuilder() = default;
 
 public:
+    FormBuilder& addLabel(const StringId labelId)
+    {
+        rowsToBuild.push_back({
+            .label = strings.getString(labelId),
+            .widget = nullptr,
+        });
+        return *this;
+    }
+
     FormBuilder& addOption(const StringId labelId, tgui::Widget::Ptr widget)
     {
-        rowsToBuild.push_back(
-            {
-                .label = strings.getString(labelId),
-                .widget = widget,
-            });
+        rowsToBuild.push_back({
+            .label = strings.getString(labelId),
+            .widget = widget,
+        });
         return *this;
     }
 
@@ -40,10 +48,9 @@ public:
         tgui::Widget::Ptr widget,
         const std::string& widgetId)
     {
-        rowsToBuild.push_back(
-            { .label = strings.getString(labelId),
-              .widget = widget,
-              .widgetId = widgetId });
+        rowsToBuild.push_back({ .label = strings.getString(labelId),
+                                .widget = widget,
+                                .widgetId = widgetId });
         return *this;
     }
 
@@ -52,10 +59,9 @@ public:
         tgui::Widget::Ptr widget,
         tgui::Button::Ptr submitBtn)
     {
-        rowsToBuild.push_back(
-            { .label = strings.getString(labelId),
-              .widget = widget,
-              .submitBtn = submitBtn });
+        rowsToBuild.push_back({ .label = strings.getString(labelId),
+                                .widget = widget,
+                                .submitBtn = submitBtn });
         return *this;
     }
 
@@ -99,6 +105,8 @@ private:
     {
         auto&& row = WidgetBuilder::createRow(sizer);
         row->add(WidgetBuilder::createTextLabel(labelText, sizer));
+
+        if (widgetPtr == nullptr) return row;
 
         auto&& widgetPanel = tgui::Group::create({ "40%", "100%" });
         widgetPanel->setPosition("60%", "0%");
