@@ -7,4 +7,6 @@ public:
 
 public:
     virtual void playClick() = 0;
+
+    virtual void playWidgetHoverEffect() = 0;
 };

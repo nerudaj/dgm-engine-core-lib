@@ -49,6 +49,7 @@ tgui::Button::Ptr WidgetBuilder::createButton(
             player.playClick();
             onClick();
         });
+    button->onMouseEnter([&player] { player.playWidgetHoverEffect(); });
     button->setTextSize(sizer.getBaseFontSize());
     button->setSize({ "100%", "100%" });
 
