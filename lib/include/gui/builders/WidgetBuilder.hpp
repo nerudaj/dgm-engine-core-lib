@@ -36,6 +36,23 @@ public:
     using Label = std::string;
 
 public:
+    template<class T>
+    [[nodiscard]] static T::Ptr
+    createContainer(const tgui::Layout2d& size, const WidgetOptions& options)
+    {
+        auto&& container = T::create(size);
+        applyOptionsToWidget(options, container);
+        return container;
+    }
+
+    template<class T>
+    [[nodiscard]] static T::Ptr createContainer(const WidgetOptions& options)
+    {
+        auto&& container = T::create();
+        applyOptionsToWidget(options, container);
+        return container;
+    }
+
     [[nodiscard]] static inline tgui::Label::Ptr createTextLabel(
         const std::string& text, const Sizer& sizer, bool justify = false)
     {
@@ -53,8 +70,7 @@ public:
         HeadingLevel level = HeadingLevel::H1,
         tgui::HorizontalAlignment alignment = tgui::HorizontalAlignment::Center)
     {
-        return createLabelInternal(
-            text, level, sizer, alignment);
+        return createLabelInternal(text, level, sizer, alignment);
     }
 
     [[nodiscard]] static tgui::Container::Ptr createRow(const Sizer& sizer);
