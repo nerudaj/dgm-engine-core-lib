@@ -31,13 +31,13 @@ void TguiHelper::alignInParent(
         align == tgui::HorizontalAlignment::Left
             ? "0%"
             : align == tgui::HorizontalAlignment::Center
-                ? "parent.width / 2 - width / 2"
-                : "parent.width - width",
+                ? "50% - width / 2"
+                : "100% - width",
         valign == tgui::VerticalAlignment::Top
             ? "0%"
             : valign == tgui::VerticalAlignment::Center
-                ? "parent.height / 2 - height / 2"
-                : "parent.height - height",
+                ? "50% - height / 2"
+                : "100% - height",
     });
     // clang-format on
 }
