@@ -15,11 +15,11 @@ public:
     convertTexture(const sf::Texture& texture, const sf::IntRect& clipping);
 
     static void alignInParent(
-        tgui::Container::Ptr container,
+        tgui::Widget::Ptr container,
         tgui::HorizontalAlignment align,
         tgui::VerticalAlignment valign);
 
-    static inline void centerInParent(tgui::Container::Ptr container)
+    static inline void centerInParent(tgui::Widget::Ptr container)
     {
         alignInParent(
             container,

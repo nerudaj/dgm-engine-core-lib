@@ -22,7 +22,7 @@ tgui::Texture TguiHelper::convertTexture(
 }
 
 void TguiHelper::alignInParent(
-    tgui::Container::Ptr container,
+    tgui::Widget::Ptr container,
     tgui::HorizontalAlignment align,
     tgui::VerticalAlignment valign)
 {
