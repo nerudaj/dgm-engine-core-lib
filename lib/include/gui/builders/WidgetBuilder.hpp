@@ -184,6 +184,12 @@ public:
         return "[1-9][0-9]*";
     }
 
+    static void setButtonEnabled(tgui::Button::Ptr button, bool enabled)
+    {
+        button->setEnabled(enabled);
+        button->getRenderer()->setOpacity(enabled ? 1.f : 0.5f);
+    }
+
 private:
     [[nodiscard]] static tgui::Label::Ptr createLabelInternal(
         const std::string& text,
