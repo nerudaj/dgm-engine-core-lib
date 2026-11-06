@@ -1,6 +1,6 @@
 #include "gui/Sizers.hpp"
 
-constexpr float CONTAINER_PADDING_MULTIPLIER = 2.55f;
+constexpr float CONTAINER_PADDING_MULTIPLIER = 2.25f;
 
 #ifdef ANDROID
 
