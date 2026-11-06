@@ -27,30 +27,37 @@ public:
 public:
     FormBuilder& addLabel(const StringId labelId)
     {
-        rowsToBuild.push_back({
+        rowsToBuild.push_back(SectionLabelRow {
             .label = strings.getString(labelId),
-            .widget = nullptr,
         });
         return *this;
     }
 
-    FormBuilder& addOption(const StringId labelId, tgui::Widget::Ptr widget)
+    FormBuilder& addOption(
+        const StringId labelId,
+        tgui::Widget::Ptr widget,
+        std::optional<std::string> widgetId = std::nullopt)
     {
-        rowsToBuild.push_back({
+        rowsToBuild.push_back(LabelWidgetRow {
             .label = strings.getString(labelId),
             .widget = widget,
+            .widgetId = widgetId,
         });
         return *this;
     }
 
-    FormBuilder& addOptionWithWidgetId(
+    [[deprecated(
+        "Use regular addOption with optional widgetId argument")]] FormBuilder&
+    addOptionWithWidgetId(
         const StringId labelId,
         tgui::Widget::Ptr widget,
         const std::string& widgetId)
     {
-        rowsToBuild.push_back({ .label = strings.getString(labelId),
-                                .widget = widget,
-                                .widgetId = widgetId });
+        rowsToBuild.push_back(LabelWidgetRow {
+            .label = strings.getString(labelId),
+            .widget = widget,
+            .widgetId = widgetId,
+        });
         return *this;
     }
 
@@ -59,15 +66,34 @@ public:
         tgui::Widget::Ptr widget,
         tgui::Button::Ptr submitBtn)
     {
-        rowsToBuild.push_back({ .label = strings.getString(labelId),
-                                .widget = widget,
-                                .submitBtn = submitBtn });
+        rowsToBuild.push_back(LabelWidgetSubmitRow {
+            .label = strings.getString(labelId),
+            .widget = widget,
+            .submitBtn = submitBtn,
+        });
+        return *this;
+    }
+
+    FormBuilder& addFullRowOption(
+        tgui::Widget::Ptr widget,
+        std::optional<std::string> widgetId = std::nullopt)
+    {
+        rowsToBuild.push_back(WidgetOnlyRow {
+            .widget = widget,
+            .widgetId = widgetId,
+        });
         return *this;
     }
 
     FormBuilder& addSeparator()
     {
-        rowsToBuild.push_back({ .separator = true });
+        rowsToBuild.push_back(HorizontalSeparatorRow {});
+        return *this;
+    }
+
+    FormBuilder& addGap()
+    {
+        rowsToBuild.push_back(GapSeparatorRow {});
         return *this;
     }
 
@@ -76,22 +102,44 @@ public:
         auto&& verticalLayout = tgui::GrowVerticalLayout::create();
         verticalLayout->getRenderer()->setPadding({ 10.f, 10.f });
 
-        for (auto&& [idx, props] : std::views::enumerate(rowsToBuild))
+        for (auto&& row : rowsToBuild)
         {
-            auto&& row =
-                props.separator ? WidgetBuilder::createRow(sizer)
-                : props.submitBtn
-                    ? createOptionRowWithSubmitButton(
-                          props.label, props.widget, props.submitBtn.value())
-                    : createOptionRow(
-                          props.label, props.widget, props.widgetId);
-
-            if (props.separator)
-            {
-                row->add(WidgetBuilder::createSeparator());
-            }
-
-            verticalLayout->add(row);
+            verticalLayout->add(std::visit(
+                overloads {
+                    [&](const HorizontalSeparatorRow&)
+                    {
+                        auto&& row = WidgetBuilder::createRow(sizer);
+                        row->add(WidgetBuilder::createSeparator());
+                        return row;
+                    },
+                    [&](const GapSeparatorRow&)
+                    { return WidgetBuilder::createRow(sizer); },
+                    [&](const SectionLabelRow& props)
+                    {
+                        auto&& row = WidgetBuilder::createRow(sizer);
+                        row->add(WidgetBuilder::createTextLabel(
+                            props.label, sizer, "justify"_true));
+                        return row;
+                    },
+                    [&](const WidgetOnlyRow& props)
+                    {
+                        auto&& row = WidgetBuilder::createRow(sizer);
+                        addToContainerWithOptionalId(
+                            props.widget, row, props.widgetId);
+                        return row;
+                    },
+                    [&](const LabelWidgetRow& row)
+                    {
+                        return createOptionRow(
+                            row.label, row.widget, row.widgetId);
+                    },
+                    [&](const LabelWidgetSubmitRow& row)
+                    {
+                        return createOptionRowWithSubmitButton(
+                            row.label, row.widget, row.submitBtn);
+                    },
+                },
+                row));
         }
 
         return verticalLayout;
@@ -103,28 +151,16 @@ private:
         tgui::Widget::Ptr widgetPtr,
         std::optional<std::string> widgetId)
     {
+        assert(widgetPtr);
+
         auto&& row = WidgetBuilder::createRow(sizer);
         row->add(WidgetBuilder::createTextLabel(labelText, sizer));
-
-        if (widgetPtr == nullptr) return row;
 
         auto&& widgetPanel = tgui::Group::create({ "40%", "100%" });
         widgetPanel->setPosition("60%", "0%");
         row->add(widgetPanel);
 
-        widgetId
-            .or_else(
-                [&]() -> std::optional<std::string>
-                {
-                    widgetPanel->add(widgetPtr);
-                    return std::nullopt;
-                })
-            .and_then(
-                [&](auto id) -> std::optional<std::string>
-                {
-                    widgetPanel->add(widgetPtr, id);
-                    return id;
-                });
+        addToContainerWithOptionalId(widgetPtr, widgetPanel, widgetId);
 
         return row;
     }
@@ -134,6 +170,9 @@ private:
         tgui::Widget::Ptr widgetPtr,
         tgui::Button::Ptr buttonPtr)
     {
+        assert(widgetPtr);
+        assert(buttonPtr);
+
         auto&& row = WidgetBuilder::createRow(sizer);
         row->add(WidgetBuilder::createTextLabel(labelText, sizer));
 
@@ -150,17 +189,68 @@ private:
         return row;
     }
 
-private:
-    struct [[nodiscard]] RowProps final
+    void addToContainerWithOptionalId(
+        tgui::Widget::Ptr widgetPtr,
+        tgui::Container::Ptr containerPtr,
+        std::optional<std::string> id)
     {
-        bool separator = false;
+        id.or_else(
+              [&]() -> std::optional<std::string>
+              {
+                  containerPtr->add(widgetPtr);
+                  return std::nullopt;
+              })
+            .and_then(
+                [&](auto id) -> std::optional<std::string>
+                {
+                    containerPtr->add(widgetPtr, id);
+                    return id;
+                });
+    }
+
+private:
+    struct [[nodiscard]] HorizontalSeparatorRow final
+    {
+    };
+
+    struct [[nodiscard]] GapSeparatorRow final
+    {
+    };
+
+    struct [[nodiscard]] SectionLabelRow final
+    {
+        std::string label;
+    };
+
+    struct [[nodiscard]] WidgetOnlyRow final
+    {
+        tgui::Widget::Ptr widget;
+        std::optional<std::string> widgetId = {};
+    };
+
+    struct [[nodiscard]] LabelWidgetRow final
+    {
         std::string label;
         tgui::Widget::Ptr widget;
         std::optional<std::string> widgetId = {};
-        std::optional<tgui::Button::Ptr> submitBtn = {};
     };
+
+    struct [[nodiscard]] LabelWidgetSubmitRow final
+    {
+        std::string label;
+        tgui::Widget::Ptr widget;
+        tgui::Button::Ptr submitBtn = {};
+    };
+
+    using RowType = std::variant<
+        HorizontalSeparatorRow,
+        GapSeparatorRow,
+        SectionLabelRow,
+        WidgetOnlyRow,
+        LabelWidgetRow,
+        LabelWidgetSubmitRow>;
 
     const StringProvider<StringId>& strings;
     const Sizer& sizer;
-    std::vector<RowProps> rowsToBuild;
+    std::vector<RowType> rowsToBuild;
 };
