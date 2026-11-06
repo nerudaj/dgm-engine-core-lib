@@ -275,6 +275,42 @@ tgui::Container::Ptr WidgetBuilder::createCarousel(
     return group;
 }
 
+tgui::Container::Ptr WidgetBuilder::createListChoice(
+    const std::vector<std::string>& items,
+    const size_t selectedIdx,
+    std::function<void(std::size_t)> onSelect,
+    const Sizer& sizer,
+    GuiAudioInterface& player,
+    WidgetOptions options)
+{
+    assert(items.size() > selectedIdx);
+    assert(!items.empty());
+
+    auto&& label =
+        createTextLabel(items.at(selectedIdx), sizer, "justify"_true);
+    auto&& pageIdx = std::make_shared<size_t>(selectedIdx);
+    auto&& list = [label = label, pageIdx = pageIdx, items = items, onSelect](
+                      int increment)
+    {
+        *pageIdx = (*pageIdx + items.size() + increment) % items.size();
+
+        label->setText(items.at(*pageIdx));
+        onSelect(*pageIdx);
+    };
+
+    auto&& hbox = tgui::HorizontalLayout::create();
+
+    auto&& leftButton = createButton("<", [list] { list(-1); }, sizer, player);
+    hbox->add(leftButton, 1.f);
+
+    hbox->add(label, 3.f);
+
+    auto&& rightButton = createButton(">", [list] { list(1); }, sizer, player);
+    hbox->add(rightButton, 1.f);
+
+    return hbox;
+}
+
 void WidgetBuilder::updateDropdownItems(
     tgui::ComboBox::Ptr dropdown, const std::vector<std::string>& items)
 {

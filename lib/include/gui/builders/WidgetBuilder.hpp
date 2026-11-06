@@ -160,6 +160,18 @@ public:
         const Sizer& sizer,
         GuiAudioInterface& audioPlayer);
 
+    /**
+     *  Mix of dropdown and carousel. You have two buttons as in carousel
+     *  to pick between options you would feed to a dropdown.
+     */
+    [[nodiscard]] static tgui::Container::Ptr createListChoice(
+        const std::vector<std::string>& items,
+        const size_t selectedIdx,
+        std::function<void(std::size_t)> onSelect,
+        const Sizer& sizer,
+        GuiAudioInterface& player,
+        WidgetOptions options = {});
+
     [[nodiscard]] static constexpr std::string
     getUnsignedNumericValidator() noexcept
     {
