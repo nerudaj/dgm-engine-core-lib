@@ -92,8 +92,8 @@ public:
     }
 
 private:
-    [[nodiscard]] static tgui::Container::Ptr createContentPanel(
-        const TabbedLayoutOptions& const options, const Sizer& sizer)
+    [[nodiscard]] static tgui::Container::Ptr
+    createContentPanel(const TabbedLayoutOptions& options, const Sizer& sizer)
     {
         if (options.contentIsScrollable)
         {
