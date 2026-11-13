@@ -37,20 +37,28 @@ public:
 
 public:
     template<class T>
-    [[nodiscard]] static T::Ptr
-    createContainer(const tgui::Layout2d& size, const WidgetOptions& options)
+    [[nodiscard]] static T::Ptr createContainer(
+        const tgui::Layout2d& size,
+        const Sizer& sizer,
+        const WidgetOptions& options)
     {
         auto&& container = T::create(size);
         applyOptionsToWidget(options, container);
+
+        if constexpr (std::is_same<T, tgui::ScrollablePanel>::value)
+        {
+            container->getRenderer()->setScrollbarWidth(
+                sizer.getBaseFontSize());
+        }
+
         return container;
     }
 
     template<class T>
-    [[nodiscard]] static T::Ptr createContainer(const WidgetOptions& options)
+    [[nodiscard]] static T::Ptr
+    createContainer(const Sizer& sizer, const WidgetOptions& options)
     {
-        auto&& container = T::create();
-        applyOptionsToWidget(options, container);
-        return container;
+        return createContainer<T>({ "100%", "100%" }, sizer, options);
     }
 
     [[nodiscard]] static inline tgui::Label::Ptr createTextLabel(

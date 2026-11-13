@@ -2,6 +2,7 @@
 
 #include "audio/GuiAudioInterface.hpp"
 #include "gui/Sizers.hpp"
+#include "gui/builders/WidgetBuilder.hpp"
 #include "strings/StringProvider.hpp"
 #include <TGUI/Backend/SFML-Graphics.hpp>
 #include <TGUI/TGUI.hpp>
@@ -61,8 +62,7 @@ public:
     [[nodiscard]] tgui::Container::Ptr
     build(const TabbedLayoutOptions& options = {})
     {
-        auto content = createContentPanel(
-            options.contentIsScrollable, options.contentClassName, sizer);
+        auto content = createContentPanel(options, sizer);
         auto tabs = WidgetBuilder::createTabs(
             tabNames,
             [tabNames = tabNames,
@@ -93,30 +93,24 @@ public:
 
 private:
     [[nodiscard]] static tgui::Container::Ptr createContentPanel(
-        bool isScrollable,
-        std::optional<std::string> className,
-        const Sizer& sizer)
+        const TabbedLayoutOptions& const options, const Sizer& sizer)
     {
-        auto panel = [isScrollable = isScrollable, &sizer]() -> tgui::Container::Ptr
+        if (options.contentIsScrollable)
         {
-            if (isScrollable)
-            {
-                auto panel = tgui::ScrollablePanel::create({ "100%", "100%" });
-#ifdef ANDROID
-                panel->getRenderer()->setScrollbarWidth(sizer.getBaseFontSize());
-#endif
-                return panel;
-            }
-            return tgui::Panel::create({ "100%", "100%" });
-        }();
-
-        if (className)
-        {
-            panel->setRenderer(
-                tgui::Theme::getDefault()->getRenderer(*className));
+            return WidgetBuilder::createContainer<tgui::ScrollablePanel>(
+                sizer,
+                WidgetOptions {
+                    .id = options.contentWidgetId,
+                    .className = options.contentClassName,
+                });
         }
 
-        return panel;
+        return WidgetBuilder::createContainer<tgui::Panel>(
+            sizer,
+            WidgetOptions {
+                .id = options.contentWidgetId,
+                .className = options.contentClassName,
+            });
     }
 
 private:
