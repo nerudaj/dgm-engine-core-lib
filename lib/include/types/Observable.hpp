@@ -25,6 +25,11 @@ public:
         return value;
     }
 
+    T get() const
+    {
+        return value;
+    }
+
 private:
     T value;
     std::function<void(T)> notifyObserver;
@@ -65,6 +70,11 @@ public:
     }
 
     operator T() const // NOLINT
+    {
+        return value;
+    }
+
+    T get() const
     {
         return value;
     }
