@@ -22,16 +22,15 @@ namespace priv
     tgui::Container::Ptr
     DefaultLayoutBuilderHelper::getContentLayout(const BuilderProperties& props)
     {
-        auto&& layout = tgui::Group::create(
-            {
-                "70%",
-                uni::format(
-                    "100% - {} - {} - {}",
-                    props.titleHeight,
-                    props.cornerButtonDimension,
-                    props.cornerButtonPadding)
-                    .c_str(),
-            });
+        auto&& layout = tgui::Group::create({
+            "70%",
+            uni::format(
+                "100% - {} - {} - {}",
+                props.titleHeight,
+                props.cornerButtonDimension,
+                props.cornerButtonPadding)
+                .c_str(),
+        });
         layout->setPosition(
             { "parent.width / 2 - width / 2", props.titleHeight });
         return layout;
@@ -43,11 +42,9 @@ namespace priv
         tgui::VerticalAlignment valign,
         bool texturedButton)
     {
-        auto&& layout = tgui::Group::create({
-            texturedButton
-                ? props.baseHeight
-                : props.cornerButtonDimension,
-            props.baseHeight });
+        auto&& layout = tgui::Group::create(
+            { texturedButton ? props.baseHeight : props.cornerButtonDimension,
+              props.baseHeight });
         const auto&& xPos = [&]() -> std::string
         {
             if (align == tgui::HorizontalAlignment::Right)
@@ -68,14 +65,15 @@ namespace priv
         return layout;
     }
 
-    tgui::Container::Ptr getTexturedTitleLayout(
+    tgui::Container::Ptr DefaultLayoutBuilderHelper::getTexturedTitleLayout(
         const BuilderProperties& props,
         const tgui::Texture& texture,
         tgui::HorizontalAlignment align)
     {
-        auto&& layout = tgui::Group::create(
-            { texture.getImageSize().x * props.titleHeight / texture.getImageSize().y,
-              props.titleHeight });
+        auto&& layout =
+            tgui::Group::create({ texture.getImageSize().x * props.titleHeight
+                                      / texture.getImageSize().y,
+                                  props.titleHeight });
 
         if (align == tgui::HorizontalAlignment::Center)
             layout->setPosition({ "parent.width / 2 - width / 2", "0%" });
