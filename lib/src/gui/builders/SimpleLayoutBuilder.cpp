@@ -71,8 +71,7 @@ tgui::Container::Ptr priv::SimpleLayoutBuilderHelper::createBottomButton(
     }
     else
     {
-        layout->setSize({ 4 * sizer.getBaseContainerHeight(),
-                          sizer.getBaseContainerHeight() });
+        layout->setSize({ "20%", sizer.getBaseContainerHeight() });
     }
 
     TguiHelper::alignInParent(
