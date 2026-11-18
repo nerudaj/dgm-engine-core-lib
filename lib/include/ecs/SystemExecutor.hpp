@@ -1,9 +1,8 @@
 #pragma once
 
+#include "ecs/SystemInterface.hpp"
 #include <tuple>
 #include <type_traits>
-
-#include "ecs/SystemInterface.hpp"
 
 /*
 struct SystemA
@@ -29,27 +28,23 @@ namespace ecs
 {
     /**
      * Executor for managing ECS System objects.
-     * 
-     * Systems passed to the constructor are sequentially executed for each update() call.
-     * Furthermore, the operator() forwards its parameter to each system, so it can be used
-     * in std::visit calls.
-     * 
+     *
+     * Systems passed to the constructor are sequentially executed for each
+     * update() call. Furthermore, the operator() forwards its parameter to each
+     * system, so it can be used in std::visit calls.
+     *
      * Executor also manages the lifetime of the systems it holds.
      */
-    template<class EventType, class TimeType, SystemType<EventType> ... Systems>
+    template<Updateable... Systems>
     class [[nodiscard]] SystemExecutor final
     {
     public:
         /**
-         * Constructs a SystemExecutor with a list of systems to manage and execute.
-         * 
-         * First two parameters are type identifiers for type deduction only, so you
-         * don't have to write template arguments explicitly.
+         * Constructs a SystemExecutor with a list of systems to manage and
+         * execute.
          */
-        constexpr SystemExecutor(
-            std::type_identity<EventType>,
-            std::type_identity<TimeType>,
-            Systems&& ... args) : systems(std::forward<Systems>(args)...)
+        constexpr SystemExecutor(Systems&&... args)
+            : systems(std::forward<Systems>(args)...)
         {
         }
 
@@ -59,28 +54,46 @@ namespace ecs
          */
         constexpr void operator()(const auto& event)
         {
-            std::apply([&event](auto&& ... systems){
-                (systems(event),...);
-            }, systems);
+            std::apply(
+                [this, &event](auto&... systems)
+                { (passEventToSystem(systems, event), ...); },
+                systems);
         }
 
     public:
         /**
          * Updates all managed systems with the given delta time.
          */
-        constexpr void update(const TimeType& dt)
+        constexpr void update(const dgm::Time& dt)
         {
-            std::apply([&dt](auto&& ... systems){
-                (systems.update(dt), ...);
-            }, systems);
+            std::apply(
+                [&dt](auto&... systems) { (systems.update(dt), ...); },
+                systems);
+        }
+
+        template<Updateable System>
+        constexpr System& get() noexcept
+        {
+            return std::get<System>(systems);
+        }
+
+        template<Updateable System>
+        constexpr const System& get() const noexcept
+        {
+            return std::get<System>(systems);
+        }
+
+    private:
+        template<Updateable System, class Event>
+        constexpr passEventToSystem(System& system, const Event& event)
+        {
+            if constexpr (Callable<System, Event>)
+            {
+                system(event);
+            }
         }
 
     private:
         std::tuple<Systems...> systems;
     };
-
-    // Deduction guide for SystemExecutor
-    template<class EventType, class TimeType, class... Systems>
-    SystemExecutor(std::type_identity<EventType>, std::type_identity<TimeType>, Systems&&...)
-        -> SystemExecutor<EventType, TimeType, std::remove_cvref_t<Systems>...>;
 } // namespace ecs
