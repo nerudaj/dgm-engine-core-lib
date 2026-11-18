@@ -5,6 +5,7 @@
 #include "gui/builders/ButtonListBuilder.hpp"
 #include "gui/builders/DefaultLayoutBuilder.hpp"
 #include "gui/builders/FormBuilder.hpp"
+#include "gui/builders/ModalBuilder.hpp"
 #include "gui/builders/NavbarLayoutBuilder.hpp"
 #include "gui/builders/SimpleLayoutBuilder.hpp"
 #include "gui/builders/TabbedLayoutBuilder.hpp"
@@ -33,12 +34,14 @@ public:
         return ButtonListBuilder(strings, sizer, audioPlayer);
     }
 
-    [[nodiscard]] DefaultLayoutBuilder<StringId> createDefaultLayoutBuilder() const
+    [[nodiscard]] DefaultLayoutBuilder<StringId>
+    createDefaultLayoutBuilder() const
     {
         return DefaultLayoutBuilder<StringId>(sizer, strings, audioPlayer);
     }
 
-    [[nodiscard]] SimpleLayoutBuilder<StringId> createSimpleLayoutBuilder() const
+    [[nodiscard]] SimpleLayoutBuilder<StringId>
+    createSimpleLayoutBuilder() const
     {
         return SimpleLayoutBuilder<StringId>(sizer, strings, audioPlayer);
     }
@@ -62,6 +65,11 @@ public:
     [[nodiscard]] TableBuilder createTableBuilder() const
     {
         return TableBuilder(sizer);
+    }
+
+    [[nodiscard]] ModalBuilder<StringId> createModalBuilder() const
+    {
+        return ModalBuilder<StringId>(strings, sizer, audioPlayer);
     }
 
 private:
