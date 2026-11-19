@@ -1,5 +1,3 @@
-cmake_minimum_required ( VERSION 3.26 )
-
 set ( TARGET dgm-engine-core-lib )
 
 if ( "${CMAKE_SYSTEM_NAME}" STREQUAL "Android" )
