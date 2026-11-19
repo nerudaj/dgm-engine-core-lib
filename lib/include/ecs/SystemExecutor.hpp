@@ -85,7 +85,7 @@ namespace ecs
 
     private:
         template<Updateable System, class Event>
-        constexpr passEventToSystem(System& system, const Event& event)
+        constexpr void passEventToSystem(System& system, const Event& event)
         {
             if constexpr (Callable<System, Event>)
             {
