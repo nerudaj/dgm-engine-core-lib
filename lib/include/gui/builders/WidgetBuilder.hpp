@@ -40,7 +40,7 @@ public:
     [[nodiscard]] static T::Ptr createContainer(
         const tgui::Layout2d& size,
         const Sizer& sizer,
-        const WidgetOptions& options)
+        const WidgetOptions& options = {})
     {
         auto&& container = T::create(size);
         applyOptionsToWidget(options, container);
@@ -56,7 +56,7 @@ public:
 
     template<class T>
     [[nodiscard]] static T::Ptr
-    createContainer(const Sizer& sizer, const WidgetOptions& options)
+    createContainer(const Sizer& sizer, const WidgetOptions& options = {})
     {
         return createContainer<T>({ "100%", "100%" }, sizer, options);
     }
