@@ -80,7 +80,7 @@ tgui::Button::Ptr WidgetBuilder::createButton(
     GuiAudioInterface& player,
     WidgetOptions options)
 {
-    auto btn = tgui::Button::create();
+    auto&& btn = tgui::Button::create();
     btn->getRenderer()->setBorders({ 0.f });
     btn->getRenderer()->setTexture(texture);
 
@@ -227,7 +227,7 @@ tgui::Tabs::Ptr WidgetBuilder::createTabs(
 
 tgui::SeparatorLine::Ptr WidgetBuilder::createSeparator()
 {
-    auto sep = tgui::SeparatorLine::create({ "100%", 1 });
+    auto&& sep = tgui::SeparatorLine::create({ "100%", 1 });
     sep->setPosition({ "0%", "49%" });
     return sep;
 }
@@ -238,10 +238,10 @@ tgui::Container::Ptr WidgetBuilder::createCarousel(
     const Sizer& sizer,
     GuiAudioInterface& player)
 {
-    auto pageLabel = createTextLabel("x / x", sizer, "justify"_true);
-    auto content = tgui::Group::create();
-    auto pageIdx = std::make_shared<size_t>(0);
-    auto changePage =
+    auto&& pageLabel = createTextLabel("x / x", sizer, "justify"_true);
+    auto&& content = tgui::Group::create();
+    auto&& pageIdx = std::make_shared<size_t>(0);
+    auto&& changePage =
         [pageIdx, pageCount, pageLabel, onPageChange, content](int increment)
     {
         *pageIdx = (*pageIdx + pageCount + increment) % pageCount;
@@ -250,19 +250,19 @@ tgui::Container::Ptr WidgetBuilder::createCarousel(
         onPageChange(content, *pageIdx);
     };
 
-    auto group = tgui::Group::create();
+    auto&& group = tgui::Group::create();
 
-    auto buttons = tgui::HorizontalLayout::create(
+    auto&& buttons = tgui::HorizontalLayout::create(
         { "100%", sizer.getBaseContainerHeight() });
     buttons->setAutoLayout(tgui::AutoLayout::Bottom);
 
-    auto prevButton =
+    auto&& prevButton =
         createButton("<", [changePage] { changePage(-1); }, sizer, player);
     buttons->add(prevButton);
 
     buttons->add(pageLabel);
 
-    auto nextButton =
+    auto&& nextButton =
         createButton(">", [changePage] { changePage(+1); }, sizer, player);
     buttons->add(nextButton);
 
