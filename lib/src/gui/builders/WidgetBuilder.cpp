@@ -300,12 +300,28 @@ tgui::Container::Ptr WidgetBuilder::createListChoice(
 
     auto&& hbox = tgui::HorizontalLayout::create();
 
-    auto&& leftButton = createButton("<", [list] { list(-1); }, sizer, player);
+    const bool enableButtons = items.size() > 1u;
+
+    auto&& leftButton = createButton(
+        "<",
+        [list] { list(-1); },
+        sizer,
+        player,
+        WidgetOptions {
+            .enabled = enableButtons,
+        });
     hbox->add(leftButton, 1.f);
 
     hbox->add(label, 3.f);
 
-    auto&& rightButton = createButton(">", [list] { list(1); }, sizer, player);
+    auto&& rightButton = createButton(
+        ">",
+        [list] { list(1); },
+        sizer,
+        player,
+        WidgetOptions {
+            .enabled = enableButtons,
+        });
     hbox->add(rightButton, 1.f);
 
     return hbox;
